@@ -1,9 +1,14 @@
-var express = require('express');
-var router = express.Router();
+const router = require('express').Router();
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+router.get('/hello', function(req, res, next) {
+  res.send({express: 'Hello there'})
 });
+
+router.get('/logout', function(req, res){
+    req.logout();
+    res.redirect('/');
+});
+
 
 module.exports = router;
