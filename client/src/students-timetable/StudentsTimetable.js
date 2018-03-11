@@ -23,7 +23,7 @@ class StudentsTimetable extends Component{
     render() {
         return (
             <div>
-                <p>{this.state.response}</p>
+                <p>Message: {this.state.response}</p>
                 <p>Tu będzie osobisty plan zajęć studenta</p>
             </div>
         );
