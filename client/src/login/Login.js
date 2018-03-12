@@ -1,28 +1,20 @@
 import React, { Component } from 'react';
 import './Login.css';
-import { FacebookLogin } from 'react-facebook-login-component';
+import FacebookLogin from 'react-facebook-login';
 
 class Login extends Component {
     sendFacebookResponse(response) {
-        console.log('Fb response:', response)
-        fetch('/api/oauth/facebook', {
-            // headers: response
-        })
+        fetch(`/api/oauth/facebook?${Object.keys(response).map(k => k+'='+response[k]).join('&')}`)
     }
 
     render() {
         return (
-        <div className="App">
-        <FacebookLogin socialId="178886982730289"
-                       language="en_US"
-                       scope="public_profile,email"
-                       responseHandler={this.sendFacebookResponse}
-                       xfbml={true}
-                       fields="id,email,name"
-                       version="v2.5"
-                       className="facebook-login"
-                       buttonText="Login With Facebook"/>
-        </div>
+            <FacebookLogin
+                appId="1617633901657669"
+                autoLoad={true}
+                fields="name,email,picture"
+                callback={this.sendFacebookResponse}
+                icon="fa-facebook"/>
     );
   }
 }

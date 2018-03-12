@@ -13,8 +13,10 @@ const users = require('./routes/users');
 const oauth = require('./routes/oauth');
 const redirections = require('./routes/redirections');
 
+const cors = require('cors')
 
 const app = express();
+
 
 app.use(logger('dev'));
 app.use(bodyParser.json());
@@ -22,16 +24,18 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(session({
     secret: '3cr3ts#tr',
-    resave: false,
-    saveUninitialized: false
+    resave: true,
+    saveUninitialized: true
 }));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(cors());
 
 app.use('/api/users', ensureAuthenticated, users);
 app.use('/api/oauth', oauth);
 app.use('/api', ensureAuthenticated, index);
 app.use('/', redirections);
+
 
 app.listen(5000);
 
@@ -41,8 +45,6 @@ function ensureAuthenticated(req, res, next) {
         console.warn("is authnaticated")
         return next();
     }
-    console.warn("is not authnaticated")
-    res.status(403)
-    res.send("you need to authenticate")
-    // res.redirect('/login')
+    res.status(401)
+    res.send({express: "you need to authenticate"})
 }
