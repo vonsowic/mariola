@@ -7,12 +7,12 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const passport = require('./config/facebook-passport');
+const flash = require('connect-flash');
 
 const users = require('./routes/users');
 const oauth = require('./routes/oauth');
 
-const User = require('./models/user');
-
+const ensureAuthenticated = require('./utils/ensure-authenticated');
 
 const app = express();
 
@@ -28,11 +28,11 @@ app.use(session({
 
 app.use(passport.initialize());
 app.use(passport.session());
-passport.serializeUser(serializeUser);
-passport.deserializeUser(deserializeUser);
+app.use(flash()); // use connect-flash for flash messages stored in session
 
-app.use('/api/users', users);
 app.use('/api/oauth', oauth);
+app.use('/api/users', ensureAuthenticated, users);
+
 app.get('/api/hello', ensureAuthenticated, function(req, res, next) {
     res.send({express: 'Hello there'})
 });
@@ -40,19 +40,4 @@ app.get('/api/hello', ensureAuthenticated, function(req, res, next) {
 
 app.listen(5000);
 
-function ensureAuthenticated(req, res, next) {
-    if (req.isAuthenticated()) {
-        return next();
-    }
-    res.status(401);
-    res.send({express: "you need to authenticate"})
-}
 
-function serializeUser(user, done) {
-    done(null, user.id)
-}
-
-function deserializeUser(userId, done){
-    User.findOrCreate({where: { id: userId }}, {default: {}})
-        .then(user => done(null, user))
-}

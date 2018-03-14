@@ -19,7 +19,29 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
-    <title>React App</title>
+
+    <script>
+        window.fbAsyncInit = function() {
+            FB.init({
+                appId      : '1617633901657669',
+                cookie     : true,
+                xfbml      : true,
+                version    : 'v2.12'
+            });
+
+            window.FB.AppEvents.logPageView();
+
+        };
+
+        (function(d, s, id){
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) {return;}
+            js = d.createElement(s); js.id = id;
+            js.src = "https://connect.facebook.net/en_US/sdk.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+    </script>
+    <title>Mariola</title>
   </head>
   <body>
     <noscript>

@@ -3,19 +3,21 @@ import './Login.css';
 import FacebookLogin from 'react-facebook-login';
 
 class Login extends Component {
-    sendFacebookResponse(response) {
-        fetch(`/api/oauth/facebook?${Object.keys(response).map(k => k+'='+response[k]).join('&')}`)
+    loginFlow(){
+        fetch("/api/oauth/facebook", {'mode': 'no-cors'})
     }
 
     render() {
         return (
+            <div>
             <FacebookLogin
                 appId="1617633901657669"
                 autoLoad={true}
                 fields="name,email,picture"
-                callback={this.sendFacebookResponse}
-                icon="fa-facebook"/>
-    );
+                callback={this.loginFlow}/>
+            <button onClick={this.loginFlow}>Login with facebook</button>
+            </div>
+        );
   }
 }
 

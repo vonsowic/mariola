@@ -4,6 +4,7 @@ import './App.css';
 import {Link, Route, BrowserRouter as Router} from 'react-router-dom';
 import Login from '../login/Login'
 import StudentsTimetable from '../students-timetable/StudentsTimetable'
+import AboutUser from '../about-user/AboutUser'
 
 class App extends Component {
     render() {
@@ -22,11 +23,15 @@ class App extends Component {
                         <li>
                             <Link to="/login">Login</Link>
                         </li>
+                        <li>
+                            <Link to="/me">Me</Link>
+                        </li>
                     </ul>
 
                     <hr />
                     <Route path="/mytimetable" component={StudentsTimetable} />
                     <Route path="/login" component={Login} />
+                    <Route path="/me" component={AboutUser}/>
                 </div>
             </Router>
         </div>
