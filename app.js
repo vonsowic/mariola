@@ -15,6 +15,7 @@ const oauth = require('./routes/oauth');
 const ensureAuthenticated = require('./utils/ensure-authenticated');
 
 const app = express();
+app.use(express.static('public'));
 
 app.use(logger('dev'));
 app.use(bodyParser.json());
