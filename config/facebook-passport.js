@@ -15,7 +15,7 @@ passport.use(new FacebookStrategy({
         clientID: process.env.CLIENT_ID,
         clientSecret: process.env.CLIENT_SECRET,
         callbackURL: process.env.FACEBOOK_CALLBACK,
-        profileFields: ['id', 'emails', 'name', 'displayName']
+        profileFields: ['id', 'emails', 'name']
     },
     async (token, refreshToken, profile, done) => {
         let user = await User.findOne({
@@ -33,7 +33,8 @@ passport.use(new FacebookStrategy({
 
 function createUser(profile, token) {
     return User.build({
-        name: profile.displayName,
+        name: profile.name.givenName,
+        lastName: profile.name.familyName,
         email: profile.emails[0].value,
         profileId: profile.id,
         accessToken: token
