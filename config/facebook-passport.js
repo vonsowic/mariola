@@ -14,7 +14,7 @@ passport.deserializeUser((userId, done) => {
 passport.use(new FacebookStrategy({
         clientID: process.env.CLIENT_ID,
         clientSecret: process.env.CLIENT_SECRET,
-        callbackURL: "http://localhost:3000/api/oauth/facebook/callback"
+        callbackURL: "/api/oauth/facebook/callback"
     },
     async (token, refreshToken, profile, done) => {
         let user = await User.findOne({
