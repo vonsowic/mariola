@@ -14,7 +14,7 @@ passport.deserializeUser((userId, done) => {
 passport.use(new FacebookStrategy({
         clientID: process.env.CLIENT_ID,
         clientSecret: process.env.CLIENT_SECRET,
-        callbackURL: "http://localhost:5000/api/oauth/facebook/callback"
+        callbackURL: "http://localhost:3000/api/oauth/facebook/callback"
     },
     (token, refreshToken, profile, done) => {
         User.findOne({
@@ -22,22 +22,24 @@ passport.use(new FacebookStrategy({
         })
             .then(user => {
                 if(!user){
-                    console.log('Profile', profile);
-                    User.build({
-                        name: profile.displayName,
-                        email: profile.email,
-                        profileId: profile.id,
-                        accessToken: token
-                    })
+                    createUser(profile, token)
                         .save()
                         .then(savedUser => done(null, savedUser))
                 } else {
                     done(null, user);
                 }
             })
-
     }
 ));
+
+function createUser(profile, token) {
+    return User.build({
+        name: profile.displayName,
+        email: profile.email,
+        profileId: profile.id,
+        accessToken: token
+    })
+}
 
 
 module.exports = passport;

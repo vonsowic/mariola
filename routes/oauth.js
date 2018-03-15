@@ -6,8 +6,8 @@ router.get('/facebook', passport.authenticate('facebook', {scope : ['public_prof
 
 router.get('/facebook/callback',
     passport.authenticate('facebook', {
-        successRedirect : '/profile.html',
-        failureRedirect: 'http://localhost:3000/login'
+        successRedirect : '/profile',
+        failureRedirect: '/login'
     }));
 
 
