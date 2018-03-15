@@ -7,4 +7,4 @@ To run, start with environmental variables:
 * DATABASE_URL=\<URL to postgres database>
 
 And start developing with 
-`yarn start` or `npm start` command
+`yarn dev` or `npm run dev` command
