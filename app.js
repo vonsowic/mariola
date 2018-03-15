@@ -10,7 +10,7 @@ const passport = require('./config/facebook-passport');
 const path = require('path');
 
 const api = require('./routes/api');
-const pages = require('./routes/pages')
+const pages = require('./routes/pages');
 
 
 const app = express();
@@ -55,4 +55,4 @@ app.use(function(err, req, res, next) {
 });
 
 
-app.listen(3000);
+app.listen(process.env.PORT || 3000);
