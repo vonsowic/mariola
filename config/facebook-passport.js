@@ -16,19 +16,17 @@ passport.use(new FacebookStrategy({
         clientSecret: process.env.CLIENT_SECRET,
         callbackURL: "http://localhost:3000/api/oauth/facebook/callback"
     },
-    (token, refreshToken, profile, done) => {
-        User.findOne({
+    async (token, refreshToken, profile, done) => {
+        let user = await User.findOne({
             where: { profileId : profile.id }
-        })
-            .then(user => {
-                if(!user){
-                    createUser(profile, token)
-                        .save()
-                        .then(savedUser => done(null, savedUser))
-                } else {
-                    done(null, user);
-                }
-            })
+        });
+
+        if(!user) {
+            user = await createUser(profile, token)
+                .save()
+        }
+
+        done(null, user);
     }
 ));
 
