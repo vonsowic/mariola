@@ -1,8 +1,6 @@
 const Symbol = require('sequelize');
-const db = require('../config/database');
 
-
-const User = db.define('users', {
+module.exports = {
     name: Symbol.STRING,
     email: Symbol.STRING,
     profileId: {    //facebook profile id
@@ -10,9 +8,4 @@ const User = db.define('users', {
         unique: true
     },
     accessToken: Symbol.STRING   // access token received from facebook
-});
-
-User
-    .sync({force: true});
-
-module.exports = User;
+};
