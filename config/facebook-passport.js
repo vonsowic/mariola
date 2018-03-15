@@ -22,7 +22,7 @@ passport.use(new FacebookStrategy({
         })
             .then(user => {
                 if(!user){
-                    console.log('Profile', profile)
+                    console.log('Profile', profile);
                     User.build({
                         name: profile.displayName,
                         email: profile.email,
