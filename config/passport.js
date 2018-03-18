@@ -5,6 +5,8 @@ const User = require('./database').User;
 
 const ExtractJWT = passportJWT.ExtractJwt;
 const JWTStrategy   = passportJWT.Strategy;
+const getJwtSecret = require('../utils/getJwtSecret');
+
 
 passport.serializeUser((user, done) => {
     done(null, user.id)
@@ -36,7 +38,7 @@ passport.use(new FacebookStrategy({
 
 passport.use(new JWTStrategy({
         jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
-        secretOrKey   : 'your_jwt_secret'
+        secretOrKey   : getJwtSecret()
     },
     function (jwtPayload, done) {
         return User.findById(jwtPayload.id)
