@@ -1,21 +1,12 @@
 const passport = require('passport');
 const FacebookStrategy = require('passport-facebook-token');
 const passportJWT = require('passport-jwt');
+const getJwtSecret = require('../utils/get-jwt-secret');
 const User = require('./database').User;
 
 const ExtractJWT = passportJWT.ExtractJwt;
 const JWTStrategy   = passportJWT.Strategy;
-const getJwtSecret = require('../utils/getJwtSecret');
 
-
-passport.serializeUser((user, done) => {
-    done(null, user.id)
-});
-
-passport.deserializeUser((userId, done) => {
-    User.findById(userId)
-        .then(user => done(null, user))
-});
 
 passport.use(new FacebookStrategy({
         clientID: process.env.CLIENT_ID,
@@ -38,18 +29,13 @@ passport.use(new FacebookStrategy({
 
 passport.use(new JWTStrategy({
         jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
-        secretOrKey   : getJwtSecret()
+        secretOrKey: getJwtSecret()
     },
-    function (jwtPayload, done) {
-        return User.findById(jwtPayload.id)
-            .then(user => {
-                return done(null, user);
-            })
-            .catch(err => {
-                return done(err);
-            });
+    (jwtPayload, done) => {
+        done(null, cleanJwtPayload(jwtPayload));
     }
 ));
+
 
 function createUser(profile, token) {
     return User.build({
@@ -59,6 +45,17 @@ function createUser(profile, token) {
         profileId: profile.id,
         accessToken: token
     })
+}
+
+
+function cleanJwtPayload(jwtPayload) {
+    return {
+        id: jwtPayload.id,
+        name: jwtPayload.name,
+        email: jwtPayload.email,
+        lastName: jwtPayload.lastName,
+        profileId: jwtPayload.profileId,
+    }
 }
 
 

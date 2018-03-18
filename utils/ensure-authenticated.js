@@ -1,7 +1,3 @@
-module.exports = (req, res, next) => {
-    if (req.isAuthenticated()) {
-        return next();
-    }
+const passport = require('../config/passport');
 
-    res.redirect(401, '/login');
-};
+module.exports = passport.authenticate('jwt', {session: false});
