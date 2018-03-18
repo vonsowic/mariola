@@ -32,7 +32,7 @@ passport.use(new JWTStrategy({
         secretOrKey: getJwtSecret()
     },
     (jwtPayload, done) => {
-        done(null, cleanJwtPayload(jwtPayload));
+        done(null, jwtPayload);
     }
 ));
 
@@ -45,17 +45,6 @@ function createUser(profile, token) {
         profileId: profile.id,
         accessToken: token
     })
-}
-
-
-function cleanJwtPayload(jwtPayload) {
-    return {
-        id: jwtPayload.id,
-        name: jwtPayload.name,
-        email: jwtPayload.email,
-        lastName: jwtPayload.lastName,
-        profileId: jwtPayload.profileId,
-    }
 }
 
 
