@@ -3,23 +3,22 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "nodemon app.js",
-    "start": "node app.js"
+    "client": "cd client && npm start",
+    "server": "nodemon app.js",
+    "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\""
   },
   "dependencies": {
     "body-parser": "~1.18.2",
-    "cookie-parser": "~1.4.3",
+    "concurrently": "^3.5.1",
     "debug": "~2.6.9",
     "dotenv": "^5.0.1",
     "express": "~4.15.5",
-    "express-session": "^1.15.6",
-    "favicon": "0.0.2",
+    "jsonwebtoken": "^8.2.0",
     "morgan": "~1.9.0",
     "passport": "^0.4.0",
-    "passport-facebook": "^2.1.1",
-    "path": "^0.12.7",
+    "passport-facebook-token": "^3.3.0",
+    "passport-jwt": "^4.0.0",
     "pg": "^7.4.1",
-    "pug": "^2.0.1",
     "sequelize": "^4.35.2"
   },
   "devDependencies": {
