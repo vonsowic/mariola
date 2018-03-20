@@ -1,1 +1,4 @@
 language: node_js
+
+notifications:
+    slack: mariolaworkspace:oM2mWX0Fx3jV0073NIutV3te
