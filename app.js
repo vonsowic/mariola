@@ -18,4 +18,4 @@ app.use(passport.initialize());
 
 app.use('/api', api);
 
-app.listen(5000);
+app.listen(process.env.PORT || 5000);
