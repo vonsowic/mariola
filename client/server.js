@@ -7,7 +7,7 @@ const app = express();
 
 app.use('/api',
     proxy({
-        target: 'http://localhost:5000'
+        target: `${process.env.URL || 'http://localhost'}:${process.env.API_PORT || 5000}`
     })
 );
 
