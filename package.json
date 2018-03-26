@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "start": "node app.js",
-    "postinstall": "cd client; npm install",
-    "client": "cd client && npm start",
+    "postinstall": "npm install --prefix client",
+    "client": "npm start --prefix client",
     "server": "nodemon app.js",
     "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\""
   },

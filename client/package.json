@@ -5,7 +5,6 @@
   "dependencies": {
     "http-proxy-middleware": "^0.18.0",
     "react": "^16.2.0",
-    "react-app-env": "^1.2.0",
     "react-bootstrap": "^0.32.1",
     "react-dom": "^16.2.0",
     "react-facebook-login": "^4.0.1",
