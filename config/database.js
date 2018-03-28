@@ -1,64 +1,47 @@
 const Sequelize = require('sequelize');
 
 const user = require('./models/user');
-const admin = require('./models/admin');
 const course = require('./models/course');
-const exchangeIntentions = require('./models/exchage_intentions');
-const exchanged = require('./models/exchanged');
 const faculty = require('./models/faculty');
 const generalPlan = require('./models/general_plan');
-const userFaculty = require('./models/user_faculty');
-const usersPlan = require('./models/users_plan');
 
 
 const db = new Sequelize(process.env.DATABASE_URL);
 
 
 const User = db.define('user', user);
-const Admin = db.define('admin', admin);
-const UserFaculty = db.define('user_faculty', userFaculty);
-const ExchangeIntentions = db.define('exchange_intention', exchangeIntentions);
-const UsersPlan = db.define('users_plan', usersPlan);
-const Faculty = db.define('faculty', faculty);
-const GeneralPlan = db.define('general_plan', generalPlan);
-const Course = db.define('course', course);
-const Exchanged = db.define('exchanges', exchanged);
+const ExchangeIntentions = db.define('exchange_intentions', {});
+const Faculty = db.define('faculties', faculty);
+const GeneralPlan = db.define('general_plans', generalPlan);
+const Course = db.define('courses', course);
+const Exchanged = db.define('exchanges', {});
 
-//create tables
-db.sync();
+User.belongsToMany(Faculty, {through: 'user_faculty'});
+Faculty.belongsToMany(User, {through: 'user_faculty'});
 
-//define relations
-User.hasMany(ExchangeIntentions);
-User.hasMany(Admin);
-User.hasOne(UsersPlan);
-User.hasMany(ExchangeIntentions);
+User.belongsToMany(Faculty, {through: 'admins'});
+Faculty.belongsToMany(User, {through: 'admins'});
 
-Faculty.hasMany(UserFaculty);
-Faculty.hasMany(Admin);
-Faculty.hasOne(GeneralPlan);
+User.belongsToMany(GeneralPlan, {through: 'user_plan'});
+GeneralPlan.belongsToMany(User, {through: 'user_plan'});
 
-GeneralPlan.hasMany(Course);
+Faculty.hasMany(GeneralPlan);
+GeneralPlan.hasMany(Course, {onDelete: 'CASCADE'});
+GeneralPlan.hasMany(Exchanged, {foreignKey: 'whatId', onDelete: 'CASCADE'});
+GeneralPlan.hasMany(Exchanged, {foreignKey: 'forId', onDelete: 'CASCADE'});
+GeneralPlan.hasMany(ExchangeIntentions, {foreignKey: 'whatId', onDelete: 'CASCADE'});
+GeneralPlan.hasMany(ExchangeIntentions, {foreignKey: 'forId', onDelete: 'CASCADE'});
 
-UsersPlan.hasMany(Course);
-UsersPlan.belongsTo(User);
+User.hasMany(ExchangeIntentions, {foreignKey: 'userFrom', onDelete: 'CASCADE'});
+User.hasMany(Exchanged, {foreignKey: 'userFrom', onDelete: 'CASCADE'});
+User.hasMany(Exchanged, {foreignKey: 'userTo', onDelete: 'CASCADE'});
 
-ExchangeIntentions.hasOne(Course, {foreignKey: 'from_id'});
-ExchangeIntentions.hasOne(Course, {foreignKey: 'to_id'});
 
-Exchanged.hasOne(Course);
-
-Exchanged.belongsTo(User, {foreignKey: 'from'});
-Exchanged.belongsTo(User, {foreignKey: 'to'});
-
-//update tables
-db.sync();
+db.sync({force: true});
 
 module.exports = {
     User,
-    Admin,
     ExchangeIntentions,
-    UserFaculty,
-    UsersPlan,
     Faculty,
     GeneralPlan,
     Course,
