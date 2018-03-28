@@ -7,3 +7,10 @@ module.exports = {
     professor: Symbol.STRING,
     name: Symbol.STRING
 };
+
+
+
+
+
+
+
