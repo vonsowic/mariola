@@ -25,15 +25,7 @@ const Course = db.define('course', course);
 const Exchanged = db.define('exchanges', exchanged);
 
 //create tables
-User.sync();
-ExchangeIntentions.sync();
-Admin.sync();
-UserFaculty.sync();
-UsersPlan.sync();
-Faculty.sync();
-GeneralPlan.sync();
-Course.sync();
-Exchanged.sync();
+db.sync();
 
 //define relations
 User.hasMany(ExchangeIntentions);
@@ -59,16 +51,7 @@ Exchanged.belongsTo(User, {foreignKey: 'from'});
 Exchanged.belongsTo(User, {foreignKey: 'to'});
 
 //update tables
-User.sync();
-ExchangeIntentions.sync();
-Admin.sync();
-UserFaculty.sync();
-UsersPlan.sync();
-Faculty.sync();
-GeneralPlan.sync();
-Course.sync();
-Exchanged.sync();
-
+db.sync();
 
 module.exports = {
     User,
