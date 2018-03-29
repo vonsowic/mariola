@@ -3,10 +3,11 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "start": "node app.js",
+    "postinstall": "cd client && npm install",
     "client": "cd client && npm start",
     "server": "nodemon app.js",
-    "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\"",
-    "install dep": "npm install && cd client && npm install"
+    "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\""
   },
   "dependencies": {
     "body-parser": "~1.18.2",
@@ -23,6 +24,7 @@
     "sequelize": "^4.35.2"
   },
   "devDependencies": {
-    "@types/express": "^4.11.1"
+    "@types/express": "^4.11.1",
+    "nodemon": "^1.17.2"
   }
 }
