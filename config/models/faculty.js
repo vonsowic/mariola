@@ -1,5 +1,5 @@
 const Symbol = require('sequelize');
 
 module.exports = {
-    test : Symbol.STRING
+    name: Symbol.STRING(40)
 };

@@ -14,7 +14,7 @@ passport.use(new FacebookStrategy({
     },
     async (token, refreshToken, profile, done) => {
         let user = await User.findOne({
-            where: { profileId : profile.id }
+            where: { fbProfileId : profile.id }
         });
 
         if(!user) {
