@@ -41,12 +41,13 @@ User.hasMany(Exchanged, {foreignKey: 'userFrom', onDelete: 'CASCADE'});
 User.hasMany(Exchanged, {foreignKey: 'userTo', onDelete: 'CASCADE'});
 
 
-db.sync({force: true});
+// db.sync({force: true});
 
 module.exports = {
     User,
     ExchangeIntention,
     Faculty,
+    AvailableFaculty,
     Course,
     CourseDetail,
     Exchanged

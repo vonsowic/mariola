@@ -2,7 +2,7 @@ const passport = require('passport');
 const FacebookStrategy = require('passport-facebook-token');
 const passportJWT = require('passport-jwt');
 const getJwtSecret = require('../utils/get-jwt-secret');
-const User = require('./database').User;
+const User = require('./database/database').User;
 
 const ExtractJWT = passportJWT.ExtractJwt;
 const JWTStrategy   = passportJWT.Strategy;

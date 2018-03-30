@@ -1,0 +1,9 @@
+{
+  "name": "database",
+  "version": "0.0.0",
+  "dependencies": {
+    "pg": "^7.4.1",
+    "sequelize": "^4.35.2"
+  },
+  "main": "database.js"
+}
