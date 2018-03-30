@@ -1,4 +1,4 @@
-class RequestError extends Error{
+class RequestError extends Error {
     constructor(status=500, message=''){
         super();
         this.status = status;
@@ -6,7 +6,7 @@ class RequestError extends Error{
     }
 }
 
-class NotFound extends RequestError{
+class NotFound extends RequestError {
     constructor(message='Not found'){
         super(404, message)
     }
