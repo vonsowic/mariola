@@ -19,7 +19,7 @@ function cleanJwtPayload(jwtPayload) {
         name: jwtPayload.name,
         email: jwtPayload.email,
         lastName: jwtPayload.lastName,
-        profileId: jwtPayload.profileId,
+        fbProfileId: jwtPayload.fbProfileId,
     }
 }
 

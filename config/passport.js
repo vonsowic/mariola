@@ -19,7 +19,6 @@ passport.use(new FacebookStrategy({
 
         if(!user) {
             user = await createUser(profile, token)
-                .save()
         }
 
         done(null, user);
@@ -38,11 +37,11 @@ passport.use(new JWTStrategy({
 
 
 function createUser(profile, token) {
-    return User.build({
+    return User.create({
         name: profile.name.givenName,
         lastName: profile.name.familyName,
         email: profile.emails[0].value,
-        profileId: profile.id,
+        fbprofileId: profile.id,
         accessToken: token
     })
 }
