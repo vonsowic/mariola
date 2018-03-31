@@ -18,10 +18,10 @@ function parse(eaiibCourseItems) {
             let title = parseTitleField(i.title);
             let x = title.length-1;
             return {
-                name: title[0],
-                lecturer: title[x]+title[x-1],
-                group: i.group,
-                place: title[x-2],
+                name: title[0].trim(),
+                lecturer: (title[x]+title[x-1]).trim(),
+                group: i.group.toString().replace('.1', 'a').replace('.2', 'b'),
+                place: title[x-2].trim(),
                 courseDetails: [{
                     start: i.start,
                     end: i.end
@@ -30,7 +30,7 @@ function parse(eaiibCourseItems) {
         })
         .reduce(
             (plan, item) => {
-                const k = key(item)
+                const k = key(item);
                 if(plan.get(k)){
                     let collectedDetails = plan.get(k).courseDetails;
                     collectedDetails = collectedDetails.concat(item.courseDetails)

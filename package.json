@@ -18,11 +18,8 @@
     "dotenv": "^5.0.1",
     "express": "~4.15.5",
     "immutable": "^3.8.2",
-    "jsonwebtoken": "^8.2.0",
     "morgan": "~1.9.0",
-    "passport": "^0.4.0",
-    "passport-facebook-token": "^3.3.0",
-    "passport-jwt": "^4.0.0",
+    "passport-mariola": "file:config/passport-mariola",
     "utils": "file:utils"
   },
   "devDependencies": {

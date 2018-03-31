@@ -24,14 +24,18 @@ router.post('/create', async (req, res, next) => {
     db.AvailableFaculty.findById(createdFaculty.availableFacultyId)
         .then(async result => {
             for(let courseItem of await eaiibDownloader(result.url)){
+                courseItem.facultyId = createdFaculty.id;
                 db.Course.create(courseItem)
-                    .then(course => courseItem
-                        .courseDetails
-                        .forEach(detail => db.CourseDetail.create({
-                            start: detail.start,
-                            end: detail.end,
-                            courseId: course.id
-                        })))
+                    .then(course => {
+                        db.CourseDetails.bulkCreate(
+                            courseItem
+                                .courseDetails
+                                .map(detail => ({
+                                    start: detail.start,
+                                    end: detail.end,
+                                    courseId: course.id
+                                })))
+                    })
             }
         });
 
@@ -73,6 +77,10 @@ router.delete('/:facultyId', (req, res) => {
         .status(204)
         .end()
 });
+
+const isAdmin = (req, res, next) => {
+    // if(req.user.faculties req.params.facultyId)
+};
 
 
 

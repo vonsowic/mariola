@@ -4,7 +4,7 @@ environmentLoader.config();
 const express = require('express');
 const logger = require('morgan');
 const bodyParser = require('body-parser');
-const passport = require('./config/passport');
+const passport = require('./config/passport-mariola/passport');
 const api = require('./routes/api');
 
 

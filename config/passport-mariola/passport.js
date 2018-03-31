@@ -1,8 +1,8 @@
 const passport = require('passport');
 const FacebookStrategy = require('passport-facebook-token');
 const passportJWT = require('passport-jwt');
-const getJwtSecret = require('../utils/get-jwt-secret');
-const User = require('./database/database').User;
+const db = require('database');
+const getJwtSecret = require('./salt');
 
 const ExtractJWT = passportJWT.ExtractJwt;
 const JWTStrategy   = passportJWT.Strategy;
@@ -13,8 +13,17 @@ passport.use(new FacebookStrategy({
         clientSecret: process.env.CLIENT_SECRET
     },
     async (token, refreshToken, profile, done) => {
-        let user = await User.findOne({
-            where: { fbProfileId : profile.id }
+        let user = await db.User.findOne({
+            where: { fbProfileId : profile.id },
+            attributes: ['id', 'name', 'lastName', 'fbProfileId'],
+            include: [{
+                model: db.Faculty,
+                attributes: ['id'],
+                through: {
+                    model: db.UserFaculty,
+                    attributes: ['isAdmin'],
+                }
+            }]
         });
 
         if(!user) {

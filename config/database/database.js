@@ -1,10 +1,12 @@
 const Sequelize = require('sequelize');
 
 const user = require('./models/user');
+const userFaculty = require('./models/user-faculty');
 const courseDetail = require('./models/course-detail');
 const faculty = require('./models/faculty');
 const availableFaculty = require('./models/available-faculties');
 const course = require('./models/course');
+const triggers = require('./triggers');
 
 
 const db = new Sequelize(process.env.DATABASE_URL);
@@ -18,17 +20,14 @@ const Course = db.define('courses', course);
 const UserCourse = db.define('user_course');
 const CourseDetail = db.define('courses_details', courseDetail);
 const Exchanged = db.define('exchanges', {});
-const UserFaculty = db.define('user_faculty', {isAdmin: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false
-    }});
-// const Admin = db.define('admins');
+const UserFaculty = db.define('user_faculty', userFaculty, {
+    hooks: {
+         afterCreate: triggers.userJoinedFaculty
+    }
+});
 
 User.belongsToMany(Faculty, {through: UserFaculty});
 Faculty.belongsToMany(User, {through: UserFaculty});
-
-// User.belongsToMany(Faculty, {through: Admin});
-// Faculty.belongsToMany(User, {through: Admin});
 
 AvailableFaculty.hasMany(Faculty);
 
