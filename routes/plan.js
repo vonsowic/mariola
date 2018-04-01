@@ -1,19 +1,26 @@
 const router = require('express').Router();
 const db = require('database');
+const date = require('utils/datetime');
+
+router.get('/my/general', (req, res)=>{
+    findAll()
+        .then(items => res.send(items))
+});
 
 
 router.get('/:facultyId/my', (req, res)=>{
-    findAllCourses(
+    findAllByFaculty(
         req.params.facultyId,
         [
             withUser(req.user.id),
-            withDetails()
+            withDetails(req.query)
         ])
         .then(items => res.send(items))
 });
 
+
 router.get('/:facultyId/my/general', (req, res)=>{
-    findAllCourses(
+    findAllByFaculty(
         req.params.facultyId,
         [
             withUser(req.user.id)
@@ -21,30 +28,34 @@ router.get('/:facultyId/my/general', (req, res)=>{
         .then(items => res.send(items))
 });
 
+
 router.get('/:facultyId', (req, res) => {
-    findAllCourses(
+    findAllByFaculty(
         req.params.facultyId,
         [
-            withDetails()
+            withDetails(req.query)
         ])
         .then(items => res.send(items))
 });
 
+
 router.get('/:facultyId/general', (req, res) => {
-    findAllCourses(req.params.facultyId)
+    findAllByFaculty(req.params.facultyId)
         .then(items => res.send(items))
 });
 
 
-const findAllCourses=(facultyId, include=[]) =>
-    db.Course
-        .findAll({
-            where: {
-                facultyId
-            },
-            attributes: ['id', 'name', 'lecturer', 'group', 'place' ],
-            include: include
-        });
+const findAll=(where={}, include=[]) =>
+    db.Course.findAll({
+        attributes: ['id', 'name', 'lecturer', 'group', 'place' ],
+        include,
+        where: where
+    });
+
+
+const findAllByFaculty=(facultyId, include=[]) =>
+    findAll({facultyId}, include);
+
 
 const withUser=(userId)=>({
     model: db.User,
@@ -52,9 +63,19 @@ const withUser=(userId)=>({
     where: {id: userId}
 });
 
-const withDetails=()=>({
+const withDetails=(interval)=>({
     model: db.CourseDetail,
-    attributes: ['start', 'end']
+    attributes: ['start', 'end'],
+    where: {
+        start: {
+            [db.Op.gt]: interval.start || date.getMondayDate()
+        },
+        end: {
+            [db.Op.lt]: interval.end || date.getSundayDate()
+        }
+    }
 });
+
+
 
 module.exports=router;

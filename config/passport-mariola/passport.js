@@ -16,14 +16,14 @@ passport.use(new FacebookStrategy({
         let user = await db.User.findOne({
             where: { fbProfileId : profile.id },
             attributes: ['id', 'name', 'lastName', 'fbProfileId'],
-            include: [{
+            include: {
                 model: db.Faculty,
                 attributes: ['id'],
                 through: {
                     model: db.UserFaculty,
                     attributes: ['isAdmin'],
                 }
-            }]
+            }
         });
 
         if(!user) {
@@ -33,6 +33,11 @@ passport.use(new FacebookStrategy({
         done(null, user);
     }
 ));
+
+async function t(u){
+    u.faculties = 0
+    return u
+}
 
 
 passport.use(new JWTStrategy({

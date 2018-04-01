@@ -20,11 +20,7 @@ const Course = db.define('courses', course);
 const UserCourse = db.define('user_course');
 const CourseDetail = db.define('courses_details', courseDetail);
 const Exchanged = db.define('exchanges', {});
-const UserFaculty = db.define('user_faculty', userFaculty, {
-    hooks: {
-         afterCreate: triggers.userJoinedFaculty
-    }
-});
+const UserFaculty = db.define('user_faculty', userFaculty);
 
 User.belongsToMany(Faculty, {through: UserFaculty});
 Faculty.belongsToMany(User, {through: UserFaculty});
@@ -45,6 +41,7 @@ User.hasMany(ExchangeIntention, {foreignKey: 'userFrom', onDelete: 'CASCADE'});
 User.hasMany(Exchanged, {foreignKey: 'userFrom', onDelete: 'CASCADE'});
 User.hasMany(Exchanged, {foreignKey: 'userTo', onDelete: 'CASCADE'});
 
+// UserFaculty.addHook('afterCreate', triggers.userJoinedFaculty);
 
 db.sync();
 
@@ -60,5 +57,6 @@ module.exports = {
     Exchanged,
     UserFaculty,
     UserCourse,
-    query
+    query,
+    Op: Sequelize.Op
 };

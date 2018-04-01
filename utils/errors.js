@@ -12,6 +12,20 @@ class NotFound extends RequestError {
     }
 }
 
+class Conflict extends RequestError {
+    constructor(message='already exists'){
+        super(409, message)
+    }
+}
+
+class NotAllowed extends RequestError {
+    constructor(message='already exists') {
+        super(403, 'you are not welcome here :/')
+    }
+}
+
 module.exports={
+    NotAllowed,
+    Conflict,
     NotFound
 };
