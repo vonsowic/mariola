@@ -12,7 +12,24 @@ const triggers = require('./triggers');
 const db = new Sequelize(process.env.DATABASE_URL);
 
 
-const User = db.define('users', user);
+const User = db.define('users', user, {
+    classMethods: {
+        findByFbIdForToken: function(id){
+            return this.findOne({
+                where: { fbProfileId : id },
+                attributes: ['id', 'name', 'lastName', 'fbProfileId'],
+                include: {
+                    model: db.Faculty,
+                    attributes: ['id'],
+                    through: {
+                        model: db.UserFaculty,
+                        attributes: ['isAdmin'],
+                    }
+                }
+            });
+        }
+    }
+});
 const ExchangeIntention = db.define('exchange_intentions', {});
 const Faculty = db.define('faculties', faculty);
 const AvailableFaculty = db.define('available_faculties', availableFaculty);
@@ -43,7 +60,7 @@ User.hasMany(Exchanged, {foreignKey: 'userTo', onDelete: 'CASCADE'});
 
 // UserFaculty.addHook('afterCreate', triggers.userJoinedFaculty);
 
-db.sync();
+db.sync({force: process.env.DROP_DATABASE});
 
 const query = x => db.query(x);
 
@@ -58,5 +75,6 @@ module.exports = {
     UserFaculty,
     UserCourse,
     query,
-    Op: Sequelize.Op
+    Op: Sequelize.Op,
+    connection: db
 };

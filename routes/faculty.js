@@ -2,6 +2,7 @@ const router = require('express').Router();
 const db = require('database');
 const error = require('utils/errors');
 const eaiibDownloader = require('utils/eaiib');
+const Recruiter = require('utils/Recruiter');
 
 
 router.post('/create', async (req, res, next) => {
@@ -38,11 +39,10 @@ router.post('/create', async (req, res, next) => {
         isAdmin: true
     });
 
-    await addCoursesToUser(
-        req.user.id,
-        createdFaculty.id,
-        req.body.initialGroup
-    );
+    await Recruiter.begin()
+        .withUser(req.user.id)
+        .toFaculty(createdFaculty.id)
+        .inGroup(req.body.initialGroup)
 
     res
         .status(201)
@@ -76,15 +76,14 @@ router.get('/available', (req, res) => {
 
 
 router.post('/join', (req, res, next) => {
-    db.UserFaculty.create({userId: req.user.id, facultyId: req.body.facultyId})
-        .then(() => addCoursesToUser(
-            req.user.id,
-            req.body.facultyId,
-            req.body.initialGroup))
+    Recruiter.begin()
+        .withUser(req.user.id)
+        .toFaculty(req.body.facultyId)
+        .inGroup(req.body.initialGroup)
         .then(() => res
             .status(201)
             .end())
-        .catch(() => {throw new error.Conflict("You are already member of faculty or faculty does not exist")})
+        .catch(() => { next(new error.Conflict("You are already member of faculty or faculty does not exist")) })
 });
 
 
@@ -95,23 +94,6 @@ router.delete('/:facultyId', ensureIsAdmin, (req, res) => {
         .status(204)
         .end()
 });
-
-
-const addCoursesToUser = (userId, facultyId, group) =>
-    db.Course
-        .findAll({
-            attributes: ['id'],
-            where:{
-                facultyId,
-                group:{
-                    [db.Op.or]: ['0', group, group[0]]
-                }
-            }
-        })
-        .then(courses => courses.map(course => ({
-            userId,
-            courseId: course.id})))
-        .then(userCourses => db.UserCourse.bulkCreate(userCourses));
 
 
 const isAdmin=(req)=>

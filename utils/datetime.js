@@ -16,5 +16,6 @@ const getSundayDate=()=>getDate(7);
 
 module.exports={
     getMondayDate,
-    getSundayDate
+    getSundayDate,
+    getDate
 };

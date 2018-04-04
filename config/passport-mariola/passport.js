@@ -13,18 +13,7 @@ passport.use(new FacebookStrategy({
         clientSecret: process.env.CLIENT_SECRET
     },
     async (token, refreshToken, profile, done) => {
-        let user = await db.User.findOne({
-            where: { fbProfileId : profile.id },
-            attributes: ['id', 'name', 'lastName', 'fbProfileId'],
-            include: {
-                model: db.Faculty,
-                attributes: ['id'],
-                through: {
-                    model: db.UserFaculty,
-                    attributes: ['isAdmin'],
-                }
-            }
-        });
+        let user = await db.User.findByFbIdForToken(profile.id);
 
         if(!user) {
             user = await createUser(profile, token)
@@ -33,11 +22,6 @@ passport.use(new FacebookStrategy({
         done(null, user);
     }
 ));
-
-async function t(u){
-    u.faculties = 0
-    return u
-}
 
 
 passport.use(new JWTStrategy({
