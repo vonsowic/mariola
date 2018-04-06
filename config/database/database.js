@@ -60,7 +60,7 @@ User.hasMany(Exchanged, {foreignKey: 'userTo', onDelete: 'CASCADE'});
 
 // UserFaculty.addHook('afterCreate', triggers.userJoinedFaculty);
 
-db.sync({force: process.env.DROP_DATABASE});
+// db.sync({force: process.env.DROP_DATABASE});
 
 const query = x => db.query(x);
 
