@@ -2,50 +2,78 @@ const expect = require('chai').expect;
 const request = require('chai-http').request;
 const dbInit = require('../prepare-database');
 const db = require('database');
+const generateToken = require('passport-mariola/jwt');
+const app = require('../../app');
 
 
 describe('Route /api/plan. Endpoints for getting course records. Details in this route is list of js object with start and end datetime.', function() {
     beforeEach('Create database and mock data', function(done){
-        dbInit().then(done)
+        dbInit(db)
+            .then(done)
     });
 
-    describe(`GET /:facultyId/my 
-    Query params: 
-    - start: 
+    after('End connection to database', () => {
+        db.connection.close();
+    });
+
+
+
+    describe(`GET /:facultyId/my
+    Query params:
+    - start:
         type: datetime
         default: previous Monday
-    - end: 
+    - end:
         type: datetime
         default: next Sunday`, function () {
-        it('Should return list of courses with details for which student, who makes request, attends', function() {
+        it('Should return list of courses with details for which student, who makes request, attends', () => {
 
         });
     });
-
-    describe('GET /:facultyId/my/general', () => {
-        it('', () => {
-
-        });
-    });
-
-    describe(`GET /:facultyId
-    Query params: 
-    - start: 
-        type: datetime
-        default: previous Monday
-    - end: 
-        type: datetime
-        default: next Sunday`, () => {
-        it('', () => {
-
-        });
-    });
-
-    describe('GET /:facultyId/general', async function (done) {
-        let facultyId = db.Faculty({where: {name: 'Sojusz rebeli'}}).then(f => f.id);
-
-        it('', function () {
-            request.get(`/api/${facultyId}`)
-        });
-    });
+    //
+    // describe('GET /:facultyId/my/general', () => {
+    //     it('', () => {
+    //
+    //     });
+    // });
+    //
+    // describe(`GET /:facultyId
+    // Query params:
+    // - start:
+    //     type: datetime
+    //     default: previous Monday
+    // - end:
+    //     type: datetime
+    //     default: next Sunday`, () => {
+    //     it('', () => {
+    //
+    //     });
+    // });
+    //
+    // describe('GET /:facultyId/general', async function (done) {
+    //     let facultyId = await db.Faculty
+    //         .findOne({where: {name: 'Sojusz rebeli'}})
+    //         .then(f => f.id);
+    //
+    //     let tester = await db.User
+    //         .findOne({ where: {name: 'Luke'}});
+    //
+    //     it('', () => {
+    //         // request.get(app)
+    //         //     .get(`/api/${facultyId}/general`)
+    //         //     .end((err, res) => {
+    //         //            if(err) {
+    //         //                done(err)
+    //         //            } else {
+    //         //                it(res.toString(), ()=>{
+    //         //                    expect(res).to.have.status(403)
+    //         //                    done()
+    //         //                })
+    //         //            }
+    //         //         done();
+    //         //     })
+    //     });
+    //
+    //     done()
+    // });
 });

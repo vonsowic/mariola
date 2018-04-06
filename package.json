@@ -2,13 +2,14 @@
   "name": "mariola",
   "version": "0.0.0",
   "private": true,
+  "main": "app.js",
   "scripts": {
     "start": "node app.js",
     "postinstall": "cd client && npm install",
     "client": "cd client && npm start",
     "server": "nodemon app.js",
     "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\"",
-    "test": "mocha --timeout 10000 --recursive"
+    "test": "DATABASE_URL=sqlite://mariola-test.db mocha --timeout 5000 --recursive **/*.test.js"
   },
   "dependencies": {
     "axios": "^0.18.0",

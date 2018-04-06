@@ -1,8 +1,6 @@
-process.env.DATABASE_URL='sqlite://mariola-test.db';
-const db = require('database');
 const Recruiter = require('utils/Recruiter');
 
-module.exports = async function () {
+module.exports = async function (db) {
     await db.connection.sync({force: true});
 
     // available faculties

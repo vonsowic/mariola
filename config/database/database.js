@@ -62,7 +62,6 @@ User.hasMany(Exchanged, {foreignKey: 'userTo', onDelete: 'CASCADE'});
 
 // db.sync({force: process.env.DROP_DATABASE});
 
-const query = x => db.query(x);
 
 module.exports = {
     User,
@@ -74,7 +73,6 @@ module.exports = {
     Exchanged,
     UserFaculty,
     UserCourse,
-    query,
     Op: Sequelize.Op,
     connection: db
 };
