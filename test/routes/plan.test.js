@@ -30,50 +30,41 @@ describe('Route /api/plan. Endpoints for getting course records. Details in this
 
         });
     });
-    //
-    // describe('GET /:facultyId/my/general', () => {
-    //     it('', () => {
-    //
-    //     });
-    // });
-    //
-    // describe(`GET /:facultyId
-    // Query params:
-    // - start:
-    //     type: datetime
-    //     default: previous Monday
-    // - end:
-    //     type: datetime
-    //     default: next Sunday`, () => {
-    //     it('', () => {
-    //
-    //     });
-    // });
-    //
-    // describe('GET /:facultyId/general', async function (done) {
-    //     let facultyId = await db.Faculty
-    //         .findOne({where: {name: 'Sojusz rebeli'}})
-    //         .then(f => f.id);
-    //
-    //     let tester = await db.User
-    //         .findOne({ where: {name: 'Luke'}});
-    //
-    //     it('', () => {
-    //         // request.get(app)
-    //         //     .get(`/api/${facultyId}/general`)
-    //         //     .end((err, res) => {
-    //         //            if(err) {
-    //         //                done(err)
-    //         //            } else {
-    //         //                it(res.toString(), ()=>{
-    //         //                    expect(res).to.have.status(403)
-    //         //                    done()
-    //         //                })
-    //         //            }
-    //         //         done();
-    //         //     })
-    //     });
-    //
-    //     done()
-    // });
+
+    describe('GET /:facultyId/my/general', () => {
+        it('', () => {
+
+        });
+    });
+
+    describe(`GET /:facultyId
+    Query params:
+    - start:
+        type: datetime
+        default: previous Monday
+    - end:
+        type: datetime
+        default: next Sunday`, () => {
+        it('', () => {
+
+        });
+    });
+
+    describe('GET /:facultyId/general', async function (done) {
+        let facultyId = await db.Faculty
+            .findOne({where: {name: 'Sojusz rebeli'}})
+            .then(f => f.id);
+
+        let tester = await db.User
+            .findOne({ where: {name: 'Luke'}});
+
+        it('', function() {
+            request.get(app)
+                .get(`/api/${facultyId}/general`)
+                .end((err, res) => {
+                    done();
+                    assert(!err)
+                })
+        });
+    });
 });

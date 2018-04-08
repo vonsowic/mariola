@@ -8,28 +8,11 @@ const availableFaculty = require('./models/available-faculties');
 const course = require('./models/course');
 const triggers = require('./triggers');
 
-
+process.env.DATABASE_URL='sqlite://mariola-test.db'
 const db = new Sequelize(process.env.DATABASE_URL);
 
 
-const User = db.define('users', user, {
-    classMethods: {
-        findByFbIdForToken: function(id){
-            return this.findOne({
-                where: { fbProfileId : id },
-                attributes: ['id', 'name', 'lastName', 'fbProfileId'],
-                include: {
-                    model: db.Faculty,
-                    attributes: ['id'],
-                    through: {
-                        model: db.UserFaculty,
-                        attributes: ['isAdmin'],
-                    }
-                }
-            });
-        }
-    }
-});
+const User = db.define('users', user);
 const ExchangeIntention = db.define('exchange_intentions', {});
 const Faculty = db.define('faculties', faculty);
 const AvailableFaculty = db.define('available_faculties', availableFaculty);
@@ -59,8 +42,6 @@ User.hasMany(Exchanged, {foreignKey: 'userFrom', onDelete: 'CASCADE'});
 User.hasMany(Exchanged, {foreignKey: 'userTo', onDelete: 'CASCADE'});
 
 // UserFaculty.addHook('afterCreate', triggers.userJoinedFaculty);
-
-// db.sync({force: process.env.DROP_DATABASE});
 
 
 module.exports = {
