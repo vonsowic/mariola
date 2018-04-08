@@ -1,0 +1,11 @@
+{
+  "name": "passport-mariola",
+  "version": "0.0.1",
+  "dependencies": {
+    "passport-jwt": "^4.0.0",
+    "passport": "^0.4.0",
+    "passport-facebook-token": "^3.3.0",
+    "jsonwebtoken": "^8.2.0"
+  },
+  "main": "passport.js"
+}

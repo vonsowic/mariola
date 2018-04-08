@@ -2,27 +2,36 @@
   "name": "mariola",
   "version": "0.0.0",
   "private": true,
+  "main": "app.js",
   "scripts": {
+    "start": "npm run server",
+    "postinstall": "cd client && npm install",
     "client": "cd client && npm start",
-    "server": "nodemon app.js",
+    "server": "nodemon ./bin/www.js",
     "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\"",
-    "install dep": "npm install && cd client && npm install"
+    "test": "DATABASE_URL=sqlite://mariola-test.db mocha --timeout 5000 --recursive"
   },
   "dependencies": {
+    "axios": "^0.18.0",
     "body-parser": "~1.18.2",
     "concurrently": "^3.5.1",
+    "database": "file:config/database",
     "debug": "~2.6.9",
     "dotenv": "^5.0.1",
     "express": "~4.15.5",
-    "jsonwebtoken": "^8.2.0",
+    "immutable": "^3.8.2",
     "morgan": "~1.9.0",
-    "passport": "^0.4.0",
-    "passport-facebook-token": "^3.3.0",
-    "passport-jwt": "^4.0.0",
-    "pg": "^7.4.1",
-    "sequelize": "^4.35.2"
+    "passport-mariola": "file:config/passport-mariola",
+    "utils": "file:utils"
   },
   "devDependencies": {
-    "@types/express": "^4.11.1"
+    "@types/express": "^4.11.1",
+    "babel-core": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "chai": "^4.1.2",
+    "chai-http": "^4.0.0",
+    "mocha": "^5.0.5",
+    "nodemon": "^1.17.2",
+    "sqlite3": "^4.0.0"
   }
 }

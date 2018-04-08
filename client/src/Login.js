@@ -4,7 +4,7 @@ import FacebookLogin from "react-facebook-login";
 class Login extends Component {
     render(){
         return (<FacebookLogin
-            appId="2124361614460680"
+            appId={process.env.CLIENT_ID}
             autoLoad={true}
             fields="name,email,picture"
             onClick={()=>{}}

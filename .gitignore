@@ -60,3 +60,4 @@ typings/
 .idea
 
 client/node_modules
+mariola-test.db
