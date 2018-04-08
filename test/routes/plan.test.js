@@ -3,7 +3,7 @@ const request = require('chai-http').request;
 const dbInit = require('../prepare-database');
 const db = require('database');
 const generateToken = require('passport-mariola/jwt');
-const app = require('../../app');
+// const app = require('../../app');
 
 
 describe('Route /api/plan. Endpoints for getting course records. Details in this route is list of js object with start and end datetime.', function() {
@@ -15,7 +15,6 @@ describe('Route /api/plan. Endpoints for getting course records. Details in this
     after('End connection to database', () => {
         db.connection.close();
     });
-
 
 
     describe(`GET /:facultyId/my
@@ -58,13 +57,13 @@ describe('Route /api/plan. Endpoints for getting course records. Details in this
         let tester = await db.User
             .findOne({ where: {name: 'Luke'}});
 
-        it('', function() {
-            request.get(app)
-                .get(`/api/${facultyId}/general`)
-                .end((err, res) => {
-                    done();
-                    assert(!err)
-                })
-        });
+        // it('', function() {
+        //     request.get(app)
+        //         .get(`/api/${facultyId}/general`)
+        //         .end((err, res) => {
+        //             done();
+        //             assert(!err)
+        //         })
+        // });
     });
 });
