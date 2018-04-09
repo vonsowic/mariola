@@ -8,7 +8,6 @@ const availableFaculty = require('./models/available-faculties');
 const course = require('./models/course');
 const triggers = require('./triggers');
 
-process.env.DATABASE_URL='sqlite://mariola-test.db'
 const db = new Sequelize(process.env.DATABASE_URL);
 
 
