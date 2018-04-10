@@ -3,10 +3,16 @@ import logo from './logo.svg';
 import './App.css';
 import Login from './Login';
 
-import { Alert } from 'react-bootstrap';
+
+
 
 
 class App extends Component {
+
+    onClickHandler(){
+        console.log("clicked");
+        axios.get("/api/users/me").then((res) => {console.log(res)});
+    }
 
   render() {
     return (

@@ -22,6 +22,7 @@
     "immutable": "^3.8.2",
     "morgan": "~1.9.0",
     "passport-mariola": "file:config/passport-mariola",
+    "react-cookie": "^2.1.4",
     "utils": "file:utils"
   },
   "devDependencies": {

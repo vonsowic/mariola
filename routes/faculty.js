@@ -42,7 +42,7 @@ router.post('/create', async (req, res, next) => {
     await Recruiter.begin()
         .withUser(req.user.id)
         .toFaculty(createdFaculty.id)
-        .inGroup(req.body.initialGroup)
+        .inGroup(req.body.initialGroup);
 
     res
         .status(201)
