@@ -46,7 +46,7 @@ router.post('/create', async (req, res, next) => {
 
     res
         .status(201)
-        .send(createdFaculty)
+        .json(createdFaculty.id)
 });
 
 
