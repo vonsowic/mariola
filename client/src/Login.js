@@ -1,21 +1,26 @@
-import React, { Component } from 'react';
+import React,{ Component } from 'react';
 import FacebookLogin from "react-facebook-login";
 import axios from 'axios';
+import { withRouter } from 'react-router-dom';
+
 
 class Login extends Component {
 
     render(){
-        return (<FacebookLogin
+        return (
+            <FacebookLogin
             appId={process.env.CLIENT_ID}
             autoLoad={true}
             fields="name,email,picture"
-            onClick={()=>{}}
+            onClick={()=>{this.nextPath("/available")}}
             callback={this.callbackHandler()}
         />)
     }
-
+    nextPath(path){
+        this.props.history.push(path);
+    }
     callbackHandler(){
-        return res => this.authenticateWithApi(res).then(this.setAxios())
+        return res => this.authenticateWithApi(res).then(Login.setAxios())
 
     }
 
@@ -35,10 +40,14 @@ class Login extends Component {
 
     }
 
-    setAxios(){
-        axios.defaults.headers.common['Authorization'] = "bearer "
-            + document.cookie.slice(document.cookie.indexOf("access_token")+13);
+    static setAxios(){
+        if(document.cookie.indexOf("access_token") !== -1) {
+            axios.defaults.headers.common['Authorization'] = "bearer "
+                + document.cookie.slice(document.cookie.indexOf("access_token") + 13);
+        }else{
+            this.nextPath("/");
+        }
     }
 }
 
-export default Login
+export default withRouter(Login);
