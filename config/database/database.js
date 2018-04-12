@@ -54,5 +54,6 @@ module.exports = {
     UserFaculty,
     UserCourse,
     Op: Sequelize.Op,
-    connection: db
+    connection: db,
+    sequelize : Sequelize
 };
