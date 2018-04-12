@@ -61,3 +61,4 @@ typings/
 
 client/node_modules
 mariola-test.db
+docker-compose.yml
