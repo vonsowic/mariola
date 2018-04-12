@@ -10,17 +10,19 @@ class  UserComp extends Component {
         surname: '',
         myfacultues: []}
     }
+
     componentDidMount(){
+        let finalState = {};
         axios.get("/api/users/me").
-        then((res) => this.setState({
+        then((res) => { this.setState({
             name: res.data.name,
             surname: res.data.lastName,
             myfaculties: res.data.faculties
-        }))
+        })});
     }
 
     render(){
-        const facs = this.state.myfacultues.map((el) => <li><Faculty data={el}/></li>);
+        const facs = this.state.myfacultues.map((el) => <li><Faculty data={el.name}/></li>);
         return(
             <div>
                 {this.state.name + " " + this.state.surname}

@@ -1,30 +1,31 @@
-import React,{ Component } from 'react';
+import React, {Component} from 'react';
 import FacebookLogin from "react-facebook-login";
 import axios from 'axios';
-import { withRouter } from 'react-router-dom';
+import {withRouter} from 'react-router-dom';
 
 
 class Login extends Component {
 
-    render(){
+    render() {
+
         return (
             <FacebookLogin
-            appId={process.env.CLIENT_ID}
-            autoLoad={true}
-            fields="name,email,picture"
-            onClick={()=>{this.nextPath("/available")}}
-            callback={this.callbackHandler()}
-        />)
+                appId={process.env.CLIENT_ID}
+                autoLoad={true}
+                fields="name,email,picture"
+                onClick={() => {}}
+                callback={this.callbackHandler()}
+            />
+        );
     }
-    nextPath(path){
-        this.props.history.push(path);
-    }
-    callbackHandler(){
-        return res => this.authenticateWithApi(res).then(Login.setAxios())
+
+    callbackHandler() {
+        return res => this.authenticateWithApi(res).then(() =>
+            Login.setAxios())
 
     }
 
-    authenticateWithApi(fbResponse){
+    authenticateWithApi(fbResponse) {
         var headers = new Headers();
         headers.append('Content-Type', 'application/json');
         headers.append('Accept', 'application/json');
@@ -40,12 +41,10 @@ class Login extends Component {
 
     }
 
-    static setAxios(){
-        if(document.cookie.indexOf("access_token") !== -1) {
+    static setAxios() {
+        if (document.cookie.indexOf("access_token") !== -1) {
             axios.defaults.headers.common['Authorization'] = "bearer "
                 + document.cookie.slice(document.cookie.indexOf("access_token") + 13);
-        }else{
-            this.nextPath("/");
         }
     }
 }

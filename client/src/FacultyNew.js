@@ -17,15 +17,18 @@ class FacultyNew extends Component {
     }
 
     validateName(name) {
-        if (name.length === 0 || name.replace(/\s/g, '').length === 0) {
-            return false;
+        if(typeof name === 'string') {
+            if (name.length === 0 || name.replace(/\s/g, '').length === 0) {
+                return false;
+            }
+            return true;
         }
-        return true;
+        return false;
     }
 
     handleSubmit(e) {
         const id = this.props.match.params.id;
-        const nameData = e.target.value;
+        const nameData = this.state.value;
         if (this.validateName(nameData)) {
             axios.post("/api/faculties/create",
                 {
@@ -49,7 +52,7 @@ class FacultyNew extends Component {
         return (
             <form onSubmit={this.handleSubmit}>
                 <label>
-                    Nazwa Grupy:
+                    Nazwa nowej grupy:
                     <input type="text" value={this.state.value} onChange={this.handleChange}/>
                 </label>
                 <input type="submit" value="Submit"/>

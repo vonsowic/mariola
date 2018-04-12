@@ -16,13 +16,15 @@ class AvailableFaculties extends  Component {
     }
     render(){
         const serverData = this.state.faculties;
-        const renderThis = serverData.map((el) => <li key={el.id}> <Link to={"/faculty/new/" + el.id}>{el.name + " semestr " + el.semester}</Link> </li>);
+        const renderThis = serverData.map((el) => <li key={el.id}> <Link to={"/available/new/" + el.id}>{el.name + " semestr " + el.semester}</Link> </li>);
         return (
             <ul>
             {renderThis}
             </ul>
         );
     }
+
+
 }
 
 

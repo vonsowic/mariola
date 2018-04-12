@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 
 
-class JoinFac extends Component {
+class JoinableFacs extends Component {
     constructor(props){
         super(props);
         this.state = {data: []}
@@ -13,13 +13,10 @@ class JoinFac extends Component {
         then((res) => this.setState({data: res.data}))
     }
 
-    joinFaculty(id){
-
-    }
 
     render(){
         const serverData = this.state.data;
-        const renderThis = serverData.map((el) => <li key={el.id}> <Link to={"/signin/" + el.id}> {el.name} </Link> </li>);
+        const renderThis = serverData.map((el) => <li key={el.id}> <Link to={"/joinable/join/" + el.id}> {el.name} </Link> </li>);
         return (
             <ul>
                 {renderThis}
@@ -28,4 +25,4 @@ class JoinFac extends Component {
     }
 }
 
-export default JoinFac;
+export default JoinableFacs;
