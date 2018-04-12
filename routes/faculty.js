@@ -54,19 +54,22 @@ router.get('/', (req, res) => {
     db.Faculty
         .findAll({
             attributes: ['id', 'name'],
+            through: {
+                model: db.UserFaculty,
+                where: req.query.onlyMy === 'true' ? {
+                    userId: req.user.id
+                } : {},
+                attributes: [],
+            },
             include: [{
                 model: db.User,
                 attributes: ['name', 'lastName'],
-                required: req.query.onlyMy === 'true',
                 through: {
                     model: db.UserFaculty,
                     where: {
-                        [db.Op.or]: [
-                            {isAdmin: true},
-                            {userId: req.query.onlyMy === 'true' ? req.user.id : -1}
-                        ]
+                        isAdmin: true
                     },
-                    attributes: [],
+                    attributes: ["isAdmin"],
                 }
             }]
         })
