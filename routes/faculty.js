@@ -80,6 +80,7 @@ router.post('/join', (req, res, next) => {
         .withUser(req.user.id)
         .toFaculty(req.body.facultyId)
         .inGroup(req.body.initialGroup)
+        .end()
         .then(() => res
             .status(201)
             .end())
