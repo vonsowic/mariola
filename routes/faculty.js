@@ -56,16 +56,11 @@ router.get('/', (req, res) => {
             attributes: ['id', 'name'],
             include: [{
                 model: db.User,
-                attributes: ['name', 'lastName'],
+                attributes: [],
                 required: req.query.onlyMy === 'true',
                 through: {
                     model: db.UserFaculty,
-                    where: {
-                        [db.Op.or]: [
-                            {isAdmin: true},
-                            {userId: req.query.onlyMy === 'true' ? req.user.id : -1}
-                        ]
-                    },
+                    where: { userId: req.user.id },
                     attributes: [],
                 }
             }]
