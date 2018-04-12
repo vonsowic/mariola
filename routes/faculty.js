@@ -46,7 +46,7 @@ router.post('/create', async (req, res, next) => {
 
     res
         .status(201)
-        .send(createdFaculty)
+        .json({id: createdFaculty.id})
 });
 
 
@@ -57,10 +57,16 @@ router.get('/', (req, res) => {
             include: [{
                 model: db.User,
                 attributes: ['name', 'lastName'],
+                required: req.query.onlyMy === 'true',
                 through: {
                     model: db.UserFaculty,
-                    where: { isAdmin: true },
-                    attributes: []
+                    where: {
+                        [db.Op.or]: [
+                            {isAdmin: true},
+                            {userId: req.query.onlyMy === 'true' ? req.user.id : -1}
+                        ]
+                    },
+                    attributes: [],
                 }
             }]
         })
@@ -80,6 +86,7 @@ router.post('/join', (req, res, next) => {
         .withUser(req.user.id)
         .toFaculty(req.body.facultyId)
         .inGroup(req.body.initialGroup)
+        .end()
         .then(() => res
             .status(201)
             .end())
