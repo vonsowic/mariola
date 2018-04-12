@@ -1,0 +1,4 @@
+FROM node:carbon
+
+EXPOSE 443
+EXPOSE 5000
