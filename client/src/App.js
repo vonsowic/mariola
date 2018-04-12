@@ -9,6 +9,7 @@ import UserComp from "./UserComp";
 import JoinIn from "./JoinIn";
 import FacultyNew from "./FacultyNew";
 import Home from "./Home";
+import Myplan from "./MyPlan";
 
 
 class App extends Component {
@@ -37,7 +38,7 @@ class App extends Component {
             <Router>
                 <div className="App">
                     <header className="App-header">
-                        <Link to="/"> MARIOLA </Link>
+                        <Link className="Home-Link" to="/"> MARIOLA </Link><br/>
                         <img src={logo} className="App-logo" alt="logo"/>
                         {userData}
                     </header>
@@ -48,6 +49,7 @@ class App extends Component {
                         <Route path="/joinable/join/:id" component={JoinIn}/>
                         <Route path="/available/new/:id" component={FacultyNew}/>
                         <Route exact path="/login" component={Login}/>
+                        <Route exact path="/myplan" component={Myplan}/>
                     </Switch>
                 </div>
             </Router>

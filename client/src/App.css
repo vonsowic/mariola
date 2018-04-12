@@ -1,15 +1,17 @@
 .App {
   text-align: center;
+  background-color: lightseagreen;
 }
 
 .App-logo {
   animation: App-logo-spin infinite 20s linear;
   height: 80px;
+
 }
 
 .App-header {
   background-color: lightcoral;
-  height: 150px;
+  height: 170px;
   padding: 20px;
   color: white;
 }
@@ -26,4 +28,10 @@
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+.Home-Link {
+  font-size: x-large;
+  color : lightseagreen;
+
+}
+
 

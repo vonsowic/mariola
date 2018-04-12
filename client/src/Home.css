@@ -1,0 +1,19 @@
+
+ul{
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+li:hover{
+    background-color: darkgrey;
+}
+
+a:link {
+    text-decoration: none;
+}
+.Home-Nav {
+    color: white;
+    font-size: larger;
+    text-decoration: none;
+}
