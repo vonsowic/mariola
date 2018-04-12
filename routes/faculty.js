@@ -97,6 +97,15 @@ router.delete('/:facultyId', ensureIsAdmin, (req, res) => {
         .end()
 });
 
+router.get('/:facultyId/groups', (req, res) => {
+db.Course.findAll({
+    where: {facultyId: req.params.facultyId},
+    attributes: [[db.sequelize.fn('DISTINCT', db.sequelize.col('group')), 'group']]})
+    .then(groups => groups.map(g => g.group))
+    .then(groups => groups.filter(g => g.length === 2))
+    .then(groups => res.send(groups));
+});
+
 
 const isAdmin=(req)=>
     req
