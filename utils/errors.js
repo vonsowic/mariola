@@ -18,6 +18,12 @@ class Conflict extends RequestError {
     }
 }
 
+class BadRequest extends RequestError{
+    constructor(message='WTF?'){
+        super(400, message)
+    }
+}
+
 class NotAllowed extends RequestError {
     constructor(message='already exists') {
         super(403, 'you are not welcome here :/')
@@ -25,6 +31,7 @@ class NotAllowed extends RequestError {
 }
 
 module.exports={
+    BadRequest,
     NotAllowed,
     Conflict,
     NotFound
