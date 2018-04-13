@@ -1,4 +1,3 @@
-const pg = require('pg');
 const Sequelize = require('sequelize');
 
 const user = require('./models/user');
@@ -56,14 +55,9 @@ const models = {
 ExchangeIntention.beforeValidate(triggers.ensureIntentionIsOk(models));
 ExchangeIntention.beforeCreate(triggers.exchangeIfMatched(models));
 
-if( process.env.DATABASE_URL.includes('pg')
-    || process.env.DATABASE_URL.includes('postgres')) {
-
-    // Exchanged.afterCreate(triggers.notifyAboutExchanged(db.query));
-}
-
 Exchanged.beforeValidate(triggers.ensureExchangeIsOk());
 Exchanged.afterCreate(triggers.removeIntentionAfterExchanged(models, Sequelize.Op));
+Exchanged.afterCreate(triggers.exchangeCourses(models));
 
 module.exports = Object.assign(
     models, {

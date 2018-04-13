@@ -63,12 +63,28 @@ const exchangeIfMatched = db => intention => {
 
 const ensureExchangeIsOk = () => exchange => {
     if(exchange.userFrom === exchange.userTo){
-        throw new err.BadRequest("You can't exchange with yourself" + exchange.toId + " " + exchange.fromId)
+        throw new err.BadRequest("You can't exchange with yourself")
     }
 };
 
-const notifyAboutExchanged = query => exchanged => {
-    query(`NOTIFY new_exchanged, '${JSON.stringify(exchanged)}';`)
+const exchangeCourses = db => exchange => {
+    db.UserCourse.update({
+        userId: exchange.userTo
+    }, {
+        where: {
+            userId: exchange.userFrom,
+            courseId: exchange.whatId
+        }
+    });
+
+    db.UserCourse.update({
+        userId: exchange.userFrom
+    }, {
+        where: {
+            userId: exchange.userTo,
+            courseId: exchange.forId
+        }
+    })
 };
 
 const removeIntentionAfterExchanged = (db, op) => (exchanged) => {
@@ -91,6 +107,6 @@ module.exports={
     ensureIntentionIsOk,
     exchangeIfMatched,
     ensureExchangeIsOk,
-    notifyAboutExchanged,
+    exchangeCourses,
     removeIntentionAfterExchanged
 };

@@ -29,16 +29,18 @@ router.post('/', (req, res, next) => {
 
 router.post('/specific', (req, res, next) => {
     db.ExchangeIntention
-        .findOne({
-            where: {id: req.body.exchangeId}
-        })
-        .then(ex => db.Exchanged.create({
-            whatId: req.body.whatId,
-            forId: req.body.forId,
-            userFrom: ex.userFrom
-        }))
-        .then(() => db.ExchangeIntention.delete({}))
-        .catch(err => next(err))
+        .findById(req.body.intentionId)
+        .then(ex => db.Exchanged
+            .create({
+                userTo: req.user.id,
+                userFrom: ex.userFrom,
+                whatId: ex.whatId,
+                forId: ex.forId
+            }))
+        .then(() => res
+            .status(201)
+            .end())
+        // .catch(err => next(err))
 });
 
 router.delete('/:intentionId', (req, res, next) => {
