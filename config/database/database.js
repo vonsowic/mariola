@@ -40,10 +40,7 @@ User.hasMany(ExchangeIntention, {foreignKey: 'userFrom', onDelete: 'CASCADE'});
 User.hasMany(Exchanged, {foreignKey: 'userFrom', onDelete: 'CASCADE'});
 User.hasMany(Exchanged, {foreignKey: 'userTo', onDelete: 'CASCADE'});
 
-// UserFaculty.addHook('afterCreate', triggers.userJoinedFaculty);
-
-
-module.exports = {
+const models = {
     User,
     ExchangeIntention,
     Faculty,
@@ -53,7 +50,18 @@ module.exports = {
     Exchanged,
     UserFaculty,
     UserCourse,
+};
+
+ExchangeIntention.beforeValidate(triggers.ensureIntentionIsOk(models));
+ExchangeIntention.beforeCreate(triggers.exchangeIfMatched(models));
+
+Exchanged.beforeValidate(triggers.ensureExchangeIsOk());
+Exchanged.afterCreate(triggers.removeIntentionAfterExchanged(models, Sequelize.Op));
+Exchanged.afterCreate(triggers.exchangeCourses(models));
+
+module.exports = Object.assign(
+    models, {
     Op: Sequelize.Op,
     connection: db,
     sequelize : Sequelize
-};
+});

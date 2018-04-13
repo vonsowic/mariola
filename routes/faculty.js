@@ -33,16 +33,11 @@ router.post('/create', async (req, res, next) => {
             }
         });
 
-    await db.UserFaculty.create({
-        userId: req.user.id,
-        facultyId: createdFaculty.id,
-        isAdmin: true
-    });
-
     await Recruiter.begin()
         .withUser(req.user.id)
         .toFaculty(createdFaculty.id)
         .inGroup(req.body.initialGroup)
+        .end();
 
     res
         .status(201)
