@@ -9,7 +9,7 @@
     "client": "cd client && npm start",
     "server": "nodemon ./bin/www.js",
     "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\"",
-    "test": "DATABASE_URL=sqlite://mariola-test.db mocha --timeout 5000 --recursive"
+    "test": "process.env.CLIENT_ID=0 DATABASE_URL=sqlite://mariola-test.db mocha --timeout 5000 --recursive"
   },
   "dependencies": {
     "axios": "^0.18.0",
