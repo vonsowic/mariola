@@ -1,58 +1,96 @@
-const db = require('database');
 const err = require('utils/errors');
 
 
-const ensureIntentionIsOk = (intention) => {
-    if(intention.fromId === intention.toId){
-        throw new err.BadRequest("You can't exchange with yourself")
-    }
-
+const ensureIntentionIsOk = db => async (intention) => {
     if(intention.whatId === intention.forId){
         throw new err.BadRequest("You are member of that course - choose another")
     }
+
+    const whatCourse = await db.Course
+        .findById(intention.whatId);
+
+    const forCourse = await db.Course
+        .findById(intention.forId);
+
+    if(!whatCourse || !forCourse){
+        throw new err.NotFound('Course does not exist')
+    }
+
+    if(whatCourse.name !== forCourse.name){
+        throw new err.BadRequest(`You can't exchange ${whatCourse.name} with ${forCourse.name}`)
+    }
+
+    if(whatCourse.group === '0' || forCourse.group === '0'){
+        throw new err.BadRequest("You can't exchange lecture")
+    }
+
+    if(whatCourse.facultyId !== forCourse.facultyId){
+        throw new err.BadRequest("You can't exchange between different faculties")
+    }
+
+    if(await db.ExchangeIntention.findOne({
+            where: {
+                userFrom: intention.userFrom,
+                whatId: intention.whatId,
+                forId: intention.forId,
+            }
+    })) {
+        throw new err.Conflict("Intention already exist")
+    }
 };
 
-const exchangedIfMatched = (intention) => {
+const exchangeIfMatched = db => intention => {
     db.ExchangeIntention
-        .findAll({
+        .findOne({
             where: {
                 whatId: intention.forId,
                 forId: intention.whatId,
             },
-            order: ['createdAt', 'ASC'],
-            limit: 1
+            order: ['createdAt'],
         })
-        .then(matchedIntentions => {
-            if(matchedIntentions.length > 0){
-                let i = matchedIntentions[0];
+        .then(matchedIntention => {
+            if(matchedIntention){
                 db.Exchanged
                     .create({
-                        whatId: i.whatId,
-                        forId: i.forId,
-                        userFrom: i.userFrom,
+                        whatId: matchedIntention.whatId,
+                        forId: matchedIntention.forId,
+                        userFrom: matchedIntention.userFrom,
                         userTo: intention.userFrom
                     })
             }
         })
 };
 
-const notifyAboutExchanged = (exchanged) => {
-    db.query(`NOTIFY new-exchanged, ${JSON.stringify(exchanged)};`)
+const ensureExchangeIsOk = () => exchange => {
+    if(exchange.userFrom === exchange.userTo){
+        throw new err.BadRequest("You can't exchange with yourself" + exchange.toId + " " + exchange.fromId)
+    }
 };
 
-const removeIntentionAfterExchanged = (exchanged) => {
+const notifyAboutExchanged = query => exchanged => {
+    query(`NOTIFY new_exchanged, '${JSON.stringify(exchanged)}';`)
+};
+
+const removeIntentionAfterExchanged = (db, op) => (exchanged) => {
     db.ExchangeIntention.destroy({
         where: {
-            userFrom: exchanged.userFrom,
-            whatId: exchanged.whatId,
-            forId: exchanged.forId,
+            [op.or]: [{
+                userFrom: exchanged.userFrom,
+                whatId: exchanged.whatId,
+                forId: exchanged.forId
+            }, {
+                userFrom: exchanged.userTo,
+                whatId: exchanged.forId,
+                forId: exchanged.whatId,
+            }]
         }
     })
 };
 
 module.exports={
     ensureIntentionIsOk,
-    exchangedIfMatched,
+    exchangeIfMatched,
+    ensureExchangeIsOk,
     notifyAboutExchanged,
     removeIntentionAfterExchanged
 };

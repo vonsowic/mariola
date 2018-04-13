@@ -1,8 +1,7 @@
 class RequestError extends Error {
     constructor(status=500, message=''){
-        super();
+        super(message);
         this.status = status;
-        this.message = message
     }
 }
 
@@ -25,8 +24,8 @@ class BadRequest extends RequestError{
 }
 
 class NotAllowed extends RequestError {
-    constructor(message='already exists') {
-        super(403, 'you are not welcome here :/')
+    constructor(message='you are not welcome here :/') {
+        super(403, message)
     }
 }
 

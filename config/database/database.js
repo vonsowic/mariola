@@ -1,3 +1,4 @@
+const pg = require('pg');
 const Sequelize = require('sequelize');
 
 const user = require('./models/user');
@@ -40,19 +41,7 @@ User.hasMany(ExchangeIntention, {foreignKey: 'userFrom', onDelete: 'CASCADE'});
 User.hasMany(Exchanged, {foreignKey: 'userFrom', onDelete: 'CASCADE'});
 User.hasMany(Exchanged, {foreignKey: 'userTo', onDelete: 'CASCADE'});
 
-ExchangeIntention.beforeValidate(triggers.ensureIntentionIsOk);
-Exchanged.beforeCreate(triggers.exchangedIfMatched);
-
-if( process.env.DATABASE_URL.includes('pg')
-    || process.env.DATABASE_URL.includes('postgres')) {
-
-    Exchanged.afterCreate(triggers.notifyAboutExchanged);
-}
-
-Exchanged.afterCreate(triggers.removeIntentionAfterExchanged);
-
-
-module.exports = {
+const models = {
     User,
     ExchangeIntention,
     Faculty,
@@ -62,7 +51,23 @@ module.exports = {
     Exchanged,
     UserFaculty,
     UserCourse,
+};
+
+ExchangeIntention.beforeValidate(triggers.ensureIntentionIsOk(models));
+ExchangeIntention.beforeCreate(triggers.exchangeIfMatched(models));
+
+if( process.env.DATABASE_URL.includes('pg')
+    || process.env.DATABASE_URL.includes('postgres')) {
+
+    // Exchanged.afterCreate(triggers.notifyAboutExchanged(db.query));
+}
+
+Exchanged.beforeValidate(triggers.ensureExchangeIsOk());
+Exchanged.afterCreate(triggers.removeIntentionAfterExchanged(models, Sequelize.Op));
+
+module.exports = Object.assign(
+    models, {
     Op: Sequelize.Op,
     connection: db,
     sequelize : Sequelize
-};
+});
