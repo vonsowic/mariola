@@ -40,7 +40,16 @@ User.hasMany(ExchangeIntention, {foreignKey: 'userFrom', onDelete: 'CASCADE'});
 User.hasMany(Exchanged, {foreignKey: 'userFrom', onDelete: 'CASCADE'});
 User.hasMany(Exchanged, {foreignKey: 'userTo', onDelete: 'CASCADE'});
 
-// UserFaculty.addHook('afterCreate', triggers.userJoinedFaculty);
+ExchangeIntention.beforeValidate(triggers.ensureIntentionIsOk);
+Exchanged.beforeCreate(triggers.exchangedIfMatched);
+
+if( process.env.DATABASE_URL.includes('pg')
+    || process.env.DATABASE_URL.includes('postgres')) {
+
+    Exchanged.afterCreate(triggers.notifyAboutExchanged);
+}
+
+Exchanged.afterCreate(triggers.removeIntentionAfterExchanged);
 
 
 module.exports = {
