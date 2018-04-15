@@ -8,7 +8,7 @@ const availableFaculty = require('./models/available-faculties');
 const course = require('./models/course');
 const triggers = require('./triggers');
 
-const db = new Sequelize(process.env.DATABASE_URL);
+const db = new Sequelize(process.env.DATABASE_URL, { logging: process.env.DATABASE_LOGGING });
 
 
 const User = db.define('users', user);
