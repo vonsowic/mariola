@@ -77,10 +77,17 @@ const sendToEachChannel = channel => record => {
 };
 
 const onNewExchangeListener = record => {
-    [record.userTo, record.userFrom]
-        .forEach(id => getFaculty(record.facultyId)
-            .get(id)
-            .send(record))
+    const notifyIfPossible = id => {
+        let conn = getFaculty(record.facultyId)
+            .get(id);
+
+        if(conn){
+            conn.send(JSON.stringify(record))
+        }
+    };
+
+    notifyIfPossible(record.userFrom);
+    notifyIfPossible(record.userTo);
 };
 
 new DBBridge(process.env.DATABASE_URL)

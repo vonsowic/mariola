@@ -36,6 +36,7 @@ class DatabaseBridge {
     }
 
     _createTrigger(channel, tableName, eventType){
+        const record = eventType.includes("delete") ? 'OLD' : 'NEW';
         return this._client.query(`
             CREATE OR REPLACE FUNCTION notification${channel}() RETURNS TRIGGER AS $$
                 DECLARE
@@ -44,12 +45,12 @@ class DatabaseBridge {
                     SELECT "facultyId" 
                     INTO fid
                     FROM courses
-                    WHERE id=NEW."whatId"
+                    WHERE id=${record}."whatId"
                     LIMIT 1;
                     
                     PERFORM pg_notify(
                         '${channel}', 
-                        (row_to_json(NEW)::jsonb || jsonb ('{"facultyId": ' || fid || '}'))::text
+                        (row_to_json(${record})::jsonb || jsonb ('{"facultyId": ' || fid || '}'))::text
                     );
                     
                     RETURN null;
