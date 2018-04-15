@@ -4,11 +4,11 @@
   "private": true,
   "main": "app.js",
   "scripts": {
-    "start": "npm run server",
-    "postinstall": "cd client && npm install",
-    "client": "cd client && npm start",
+    "start": "yarn server",
+    "postinstall": "cd client && yarn install",
+    "client": "cd client && yarn start",
     "server": "nodemon ./bin/www.js",
-    "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\"",
+    "dev": "concurrently --kill-others-on-fail \"yarn server\" \"yarn client\"",
     "test": "CLIENT_ID=0 DATABASE_URL=sqlite://mariola-test.db mocha --timeout 5000 --recursive"
   },
   "dependencies": {
