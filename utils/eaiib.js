@@ -15,16 +15,14 @@ function parse(eaiibCourseItems) {
     return eaiibCourseItems
         .data
         .map(i => {
-            let title = parseTitleField(i.title);
-            let x = title.length-1;
+            let title = parseTitleField(i.title)
             return {
-                name: title[0].trim(),
-                lecturer: (title[x]+title[x-1]).trim(),
+                name: title[0],
                 group: i.group.toString().replace('.1', 'a').replace('.2', 'b'),
-                place: title[x-2].trim(),
+                other: title[1],
                 courseDetails: [{
-                    start: i.start,
-                    end: i.end
+                    start: i.start.toLocaleString(),
+                    end: i.end.toLocaleString()
                 }]
             }
         })
@@ -33,7 +31,7 @@ function parse(eaiibCourseItems) {
                 const k = key(item);
                 if(plan.get(k)){
                     let collectedDetails = plan.get(k).courseDetails;
-                    collectedDetails = collectedDetails.concat(item.courseDetails)
+                    collectedDetails = collectedDetails.concat(item.courseDetails);
                     item.courseDetails = collectedDetails
                 }
 
@@ -47,13 +45,9 @@ function parseTitleField(it){
         it = it.substring(0, it.indexOf("Informacja"))
     }
 
-    it = it
-        .replace(/<br\/>/g, ',')
-        .replace('prowadzący: ', '')
-        .replace('Sala: ', '')
-        .split(',');
-
     return it
+        .replace(/<br\/>/g, ',')
+        .split(/,(.+)/);
 }
 
 function key(obj){
