@@ -10,10 +10,15 @@ const triggers = require('./triggers/triggers');
 const courseTriggers = require('./triggers/course');
 
 
-const db = new Sequelize(process.env.DATABASE_URL, {
-    logging: process.env.DATABASE_LOGGING === 'true' ? console.log : false,
-    timezone: 'Europe/Warsaw'
-});
+const db = new Sequelize(
+    process.env.DATABASE_URL,
+    Object.assign({
+        logging: process.env.DATABASE_LOGGING === 'true' ? console.log : false
+    }, (process.env.DATABASE_URL.includes('postgres'))
+        ? {timezone: 'Europe/Warsaw'} // POSTGRES
+        : {})                           // OTHER DB
+);
+
 
 
 const User = db.define('users', user);
