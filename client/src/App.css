@@ -1,6 +1,6 @@
 .App {
   text-align: center;
-  background-color: lightseagreen;
+  background-color: #fcfcfc;
 }
 
 .App-logo {
@@ -10,7 +10,7 @@
 }
 
 .App-header {
-  background-color: lightcoral;
+  background-color: #2a324b;
   height: 170px;
   padding: 20px;
   color: white;
@@ -30,7 +30,7 @@
 }
 .Home-Link {
   font-size: x-large;
-  color : lightseagreen;
+  color : #f06543;
 
 }
 

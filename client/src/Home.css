@@ -6,14 +6,14 @@ ul{
 }
 
 li:hover{
-    background-color: darkgrey;
+    background-color: #f06543;
 }
 
 a:link {
     text-decoration: none;
 }
 .Home-Nav {
-    color: white;
+    color: #343434;
     font-size: larger;
     text-decoration: none;
 }
