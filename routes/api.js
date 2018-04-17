@@ -1,9 +1,9 @@
 const router = require('express').Router();
 const oauth = require('./oauth');
 const users = require('./users');
-const plan = require('./plan');
+const plan = require('./plan/controller');
 const faculty = require('./faculty');
-const exchange = require('./exchange');
+const exchange = require('./intention');
 const ensureAuthenticated = require('utils/ensure-authenticated');
 
 router.use('/oauth', oauth);

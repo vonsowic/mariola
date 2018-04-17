@@ -67,13 +67,15 @@ wsServer.on('request', request => {
     });
 });
 
+const createMessage = (channel, record) =>
+    JSON.stringify({
+        channel,
+        record
+    });
 
 const sendToEachChannel = channel => record => {
     getFaculty(record.facultyId)
-        .forEach(conn => conn.send(JSON.stringify({
-            channel: channel,
-            record: record
-        })))
+        .forEach(conn => conn.send(createMessage(channel, record)))
 };
 
 const onNewExchangeListener = record => {
@@ -82,7 +84,7 @@ const onNewExchangeListener = record => {
             .get(id);
 
         if(conn){
-            conn.send(JSON.stringify(record))
+            conn.send(createMessage(channels.EXCHANGE_CREATED, record))
         }
     };
 
@@ -90,7 +92,7 @@ const onNewExchangeListener = record => {
     notifyIfPossible(record.userTo);
 };
 
-new DBBridge(process.env.DATABASE_URL)
+new DBBridge()
     .setListenerOn(channels.INTENTION_CREATED, sendToEachChannel(channels.INTENTION_CREATED))
     .setListenerOn(channels.INTENTION_REMOVED, sendToEachChannel(channels.INTENTION_REMOVED))
     .setListenerOn(channels.EXCHANGE_CREATED, onNewExchangeListener);

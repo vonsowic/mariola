@@ -6,9 +6,19 @@ const courseDetail = require('./models/course-detail');
 const faculty = require('./models/faculty');
 const availableFaculty = require('./models/available-faculties');
 const course = require('./models/course');
-const triggers = require('./triggers');
+const triggers = require('./triggers/triggers');
+const courseTriggers = require('./triggers/course');
 
-const db = new Sequelize(process.env.DATABASE_URL, { logging: process.env.DATABASE_LOGGING });
+
+const db = new Sequelize(
+    process.env.DATABASE_URL,
+    Object.assign({
+        logging: process.env.DATABASE_LOGGING === 'true' ? console.log : false
+    }, (process.env.DATABASE_URL.includes('postgres'))
+        ? {timezone: 'Europe/Warsaw'} // POSTGRES
+        : {})                           // OTHER DB
+);
+
 
 
 const User = db.define('users', user);
@@ -58,6 +68,8 @@ ExchangeIntention.beforeCreate(triggers.exchangeIfMatched(models));
 Exchanged.beforeValidate(triggers.ensureExchangeIsOk());
 Exchanged.afterCreate(triggers.removeIntentionAfterExchanged(models, Sequelize.Op));
 Exchanged.afterCreate(triggers.exchangeCourses(models));
+
+Course.beforeValidate(courseTriggers.insertDefaultMaxStudentsNumber);
 
 module.exports = Object.assign(
     models, {
