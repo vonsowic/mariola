@@ -2,6 +2,7 @@ import React , { Component } from 'react';
 import {Navbar, NavItem,Nav,NavbarBrand,} from 'react-bootstrap';
 import {Link} from "react-router-dom";
 import "./cssData/Menu.css"
+import UserComp from "./UserComp";
 
 class Menu extends Component {
 
@@ -22,6 +23,11 @@ class Menu extends Component {
                     </NavItem>
                     <NavItem eventKey={2}>
                         <Link className="Home-Nav" to="/myplan">Mój plan</Link>
+                    </NavItem>
+                </Nav>
+                <Nav pullRight>
+                    <NavItem>
+                        <UserComp/>
                     </NavItem>
                 </Nav>
 

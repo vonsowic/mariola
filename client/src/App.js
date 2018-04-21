@@ -40,7 +40,6 @@ class App extends Component {
                     <header className="App-header">
                         {menu}
                         <img src={logo} className="App-logo" alt="logo"/>
-                        {userData}
                     </header>
                     <Switch>
                         <Route exact path="/" render={() => isLogged ? (<Home/>) : (<Redirect to="/login" push/>)}/>
