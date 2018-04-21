@@ -13,7 +13,7 @@ class Login extends Component {
                 appId={process.env.CLIENT_ID}
                 autoLoad={true}
                 fields="name,email,picture"
-                onClick={() => {}}
+                onClick={() => {this.props.history.push("/");}}
                 callback={this.callbackHandler()}
             />
         );
