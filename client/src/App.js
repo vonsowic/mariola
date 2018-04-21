@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import logo from './shovel.png';
-import './App.css';
+import './cssData/App.css';
 import Login from './Login';
 import {BrowserRouter as Router, Route, Link, Switch, Redirect} from 'react-router-dom';
 import AvailableFaculties from './AvailableFaculties';
@@ -10,6 +10,7 @@ import JoinIn from "./JoinIn";
 import FacultyNew from "./FacultyNew";
 import Home from "./Home";
 import Myplan from "./MyPlan";
+import Menu from "./Menu";
 
 
 class App extends Component {
@@ -31,14 +32,13 @@ class App extends Component {
 
     render() {
         const isLogged = this.logged();
-        console.log(isLogged);
         const userData = isLogged ? (<UserComp/>) : (<p> Hej! Zaloguj się :)</p>);
+        const menu = isLogged ? (<Menu/>): (<p></p>);
         return (
-
             <Router>
                 <div className="App">
                     <header className="App-header">
-                        <Link className="Home-Link" to="/"> MARIOLA </Link><br/>
+                        {menu}
                         <img src={logo} className="App-logo" alt="logo"/>
                         {userData}
                     </header>

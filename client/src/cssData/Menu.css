@@ -1,13 +1,16 @@
+.Home-Link {
+    color : #f06543; !important;
+
+}
+
+.Whole-Navbar {
+    background-color: #2a324b;
+}
 
 ul{
     list-style-type: none;
     margin: 0;
     padding: 0;
-}
-
-li {
-    padding: 0.6%;
-
 }
 
 li:hover{

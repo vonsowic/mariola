@@ -11,8 +11,8 @@
 
 .App-header {
   background-color: #2a324b;
-  height: 170px;
-  padding: 20px;
+  height: 10%;
+  /*padding: 20px;*/
   color: white;
 }
 
@@ -28,10 +28,6 @@
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
-.Home-Link {
-  font-size: x-large;
-  color : #f06543;
 
-}
 
 

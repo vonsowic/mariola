@@ -1,18 +1,15 @@
 import React , { Component } from 'react';
 import { Link } from 'react-router-dom';
-import "./Home.css"
+import "./cssData/Home.css"
+import MyPlan from "./MyPlan";
+import Menu  from "./Menu";
 
 class Home extends  Component{
 
 
     render(){
         return(
-            <ul>
-                <li><Link className="Home-Nav" to="/available"> Dodaj nowy kierunek </Link></li>
-                <li><Link className="Home-Nav" to="/joinable"> Dołącz </Link></li>
-                <li><Link className="Home-Nav" to="/myplan">Mój plan</Link></li>
-            </ul>
-
+            <MyPlan/>
         );
     }
 
