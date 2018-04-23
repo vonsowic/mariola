@@ -9,7 +9,7 @@ router.get('/:facultyId', (req, res) => {
 router.post('/', (req, res, next) => {
     service.create(req.body.forId, req.user.id)
         .then(ex => res.send({id: ex.id}))
-        .catch(err => next(err))
+        // .catch(err => next(err))
 });
 
 router.post('/specific', (req, res, next) => {

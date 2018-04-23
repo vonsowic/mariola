@@ -8,13 +8,13 @@ const ensureIntentionIsOk = db => async intention => {
     const whatCourse = await db.Course
         .findOne({
             where: {
-                name: 'Hurtownie danych',
-                facultyId: 6,//forCourse.facultyId,
+                name: forCourse.name,
+                facultyId: forCourse.facultyId,
                 group: {
-                    [Op.ne]: 0
+                    [Op.ne]: '0'
                 },
                 id: {
-                    [Op.ne]: 277//forCourse.id
+                    [Op.ne]: forCourse.id
                 }
             },
             through: {
@@ -27,7 +27,7 @@ const ensureIntentionIsOk = db => async intention => {
 
 
     if(!whatCourse || !forCourse){
-        throw new err.BadRequest('Course does not exist')
+        throw new err.BadRequest()
     }
 
     if(await db.ExchangeIntention.findOne({
@@ -39,6 +39,8 @@ const ensureIntentionIsOk = db => async intention => {
     })) {
         throw new err.Conflict("Intention already exist")
     }
+
+    intention.whatId = whatCourse.id;
 };
 
 const exchangeIfMatched = db => intention => {

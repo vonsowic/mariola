@@ -27,7 +27,7 @@ client.on('connect', function(connection) {
         if (connection.connected) {
             connection.sendUTF(JSON.stringify({
                 token: "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwibmFtZSI6Ik1pY2hhxYIiLCJsYXN0TmFtZSI6IlfEhXNvd2ljeiIsImZiUHJvZmlsZUlkIjoiOTU4MDg1Njk3Njc5Njk3IiwiZmFjdWx0aWVzIjpbeyJpZCI6NSwidXNlcl9mYWN1bHR5Ijp7ImlzQWRtaW4iOmZhbHNlfX1dfQ.j9hwbJMXRs2Mw7J0inXK7Vuqv_TSrYUDSxrA5LOaRZM",
-                facultyId: 5
+                facultyId: 6
             }));
             setTimeout(sendToken, 1000);
         }
