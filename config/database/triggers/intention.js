@@ -1,31 +1,33 @@
 const err = require('utils/errors');
+const Op = require('sequelize').Op;
 
-
-const ensureIntentionIsOk = db => async (intention) => {
-    if(intention.whatId === intention.forId){
-        throw new err.BadRequest("You are member of that course - choose another")
-    }
-
-    const whatCourse = await db.Course
-        .findById(intention.whatId);
-
+const ensureIntentionIsOk = db => async intention => {
     const forCourse = await db.Course
         .findById(intention.forId);
 
+    const whatCourse = await db.Course
+        .findOne({
+            where: {
+                name: forCourse.name,
+                facultyId: forCourse.facultyId,
+                group: {
+                    [Op.ne]: '0'
+                },
+                id: {
+                    [Op.ne]: forCourse.id
+                }
+            },
+            through: {
+                model: db.UserCourse,
+                where: {
+                    userId: intention.userFrom
+                }
+            }
+        });
+
+
     if(!whatCourse || !forCourse){
-        throw new err.NotFound('Course does not exist')
-    }
-
-    if(whatCourse.name !== forCourse.name){
-        throw new err.BadRequest(`You can't exchange ${whatCourse.name} with ${forCourse.name}`)
-    }
-
-    if(whatCourse.group === '0' || forCourse.group === '0'){
-        throw new err.BadRequest("You can't exchange lecture")
-    }
-
-    if(whatCourse.facultyId !== forCourse.facultyId){
-        throw new err.BadRequest("You can't exchange between different faculties")
+        throw new err.BadRequest()
     }
 
     if(await db.ExchangeIntention.findOne({
@@ -37,6 +39,8 @@ const ensureIntentionIsOk = db => async (intention) => {
     })) {
         throw new err.Conflict("Intention already exist")
     }
+
+    intention.whatId = whatCourse.id;
 };
 
 const exchangeIfMatched = db => intention => {
