@@ -6,7 +6,7 @@ const courseDetail = require('./models/course-detail');
 const faculty = require('./models/faculty');
 const availableFaculty = require('./models/available-faculties');
 const course = require('./models/course');
-const triggers = require('./triggers/triggers');
+const triggers = require('./triggers/intention');
 const courseTriggers = require('./triggers/course');
 
 

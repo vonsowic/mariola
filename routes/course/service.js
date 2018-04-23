@@ -46,7 +46,8 @@ const findAll=(where={}, include=[]) =>
     db.Course.findAll({
         attributes: ['id', 'name', 'group', 'other'],
         include,
-        where: where
+        where: where,
+        raw: true
     });
 
 
@@ -71,7 +72,8 @@ const withDetails= interval =>({
         end: {
             [db.Op.lt]: interval.end || date.getSundayDate()
         }
-    }
+    },
+    raw: true
 });
 
 module.exports={
