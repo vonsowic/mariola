@@ -1,17 +1,23 @@
 const db = require('database');
 
 const findAllIntentionsByFacultyId = facultyId =>
-    db.ExchangeIntention
+    db.Course
         .findAll({
-            attributes: ['id', 'whatId', 'forId', 'userFrom'],
-            through: {
-                model: db.Course,
-                attributes: [],
-                where: {
-                    facultyId
-                }
-            }
-        });
+            where: {facultyId},
+            attributes: ['id']
+        })
+        .map(c => c.id)
+        .then(ids =>
+            db.ExchangeIntention
+                .findAll({
+                    attributes: ['id', 'whatId', 'forId', 'userFrom'],
+                    where: {
+                        whatId: {
+                            [db.Op.in]: ids
+                        }
+                    }
+                }));
+
 
 
 const create = (forId, userFrom) =>

@@ -30,6 +30,8 @@ const ensureIntentionIsOk = db => async intention => {
         throw new err.BadRequest()
     }
 
+    intention.whatId = whatCourse.id;
+
     if(await db.ExchangeIntention.findOne({
             where: {
                 userFrom: intention.userFrom,
@@ -39,8 +41,6 @@ const ensureIntentionIsOk = db => async intention => {
     })) {
         throw new err.Conflict("Intention already exist")
     }
-
-    intention.whatId = whatCourse.id;
 };
 
 const exchangeIfMatched = db => intention => {
