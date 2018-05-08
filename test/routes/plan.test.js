@@ -6,7 +6,7 @@ const generateToken = require('passport-mariola/jwt');
 // const app = require('../../app');
 
 
-describe('Route /api/plan. Endpoints for getting course records. Details in this route is list of js object with start and end datetime.', function() {
+describe('Route /api/course. Endpoints for getting course records. Details in this route is list of js object with start and end datetime.', function() {
     beforeEach('Create database and mock data', function(done){
         dbInit(db)
             .then(done)

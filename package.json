@@ -4,12 +4,12 @@
   "private": true,
   "main": "app.js",
   "scripts": {
-    "start": "npm run server",
-    "postinstall": "cd client && npm install",
-    "client": "cd client && npm start",
+    "start": "yarn server",
+    "postinstall": "cd client && yarn install",
+    "client": "cd client && yarn start",
     "server": "nodemon ./bin/www.js",
-    "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\"",
-    "test": "DATABASE_URL=sqlite://mariola-test.db mocha --timeout 5000 --recursive"
+    "dev": "concurrently --kill-others-on-fail \"yarn server\" \"yarn client\"",
+    "test": "CLIENT_ID=0 DATABASE_URL=sqlite://mariola-test.db mocha --timeout 5000 --recursive"
   },
   "dependencies": {
     "axios": "^0.18.0",
@@ -20,7 +20,9 @@
     "dotenv": "^5.0.1",
     "express": "~4.15.5",
     "immutable": "^3.8.2",
+    "jsonwebtoken": "^8.2.1",
     "morgan": "~1.9.0",
+    "notification-service": "file:notification",
     "passport-mariola": "file:config/passport-mariola",
     "react-cookie": "^2.1.4",
     "utils": "file:utils"

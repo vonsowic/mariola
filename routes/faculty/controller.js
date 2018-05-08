@@ -33,16 +33,11 @@ router.post('/create', async (req, res, next) => {
             }
         });
 
-    await db.UserFaculty.create({
-        userId: req.user.id,
-        facultyId: createdFaculty.id,
-        isAdmin: true
-    });
-
     await Recruiter.begin()
         .withUser(req.user.id)
         .toFaculty(createdFaculty.id)
-        .inGroup(req.body.initialGroup);
+        .inGroup(req.body.initialGroup)
+        .end();
 
     res
         .status(201)
@@ -56,16 +51,11 @@ router.get('/', (req, res) => {
             attributes: ['id', 'name'],
             include: [{
                 model: db.User,
-                attributes: ['name', 'lastName'],
+                attributes: [],
                 required: req.query.onlyMy === 'true',
                 through: {
                     model: db.UserFaculty,
-                    where: {
-                        [db.Op.or]: [
-                            {isAdmin: true},
-                            {userId: req.query.onlyMy === 'true' ? req.user.id : -1}
-                        ]
-                    },
+                    where: { userId: req.user.id },
                     attributes: [],
                 }
             }]
@@ -100,6 +90,15 @@ router.delete('/:facultyId', ensureIsAdmin, (req, res) => {
     res
         .status(204)
         .end()
+});
+
+router.get('/:facultyId/groups', (req, res) => {
+db.Course.findAll({
+    where: {facultyId: req.params.facultyId},
+    attributes: [[db.sequelize.fn('DISTINCT', db.sequelize.col('group')), 'group']]})
+    .then(groups => groups.map(g => g.group))
+    .then(groups => groups.filter(g => g.length === 2))
+    .then(groups => res.send(groups));
 });
 
 
