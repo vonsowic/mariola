@@ -6,7 +6,8 @@ const jwt = require('passport-mariola/jwt');
 router.get('/facebook/token',
     passport.authenticate('facebook-token', {session: false}),
     (req, res) => {
-        res.json({token: jwt(req.user)});
+        res.cookie("access_token",jwt(req.user),{path:"/",httpOnly: false}).send();
+
     }
 );
 

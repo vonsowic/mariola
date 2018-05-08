@@ -24,6 +24,7 @@
     "morgan": "~1.9.0",
     "notification-service": "file:notification",
     "passport-mariola": "file:config/passport-mariola",
+    "react-cookie": "^2.1.4",
     "utils": "file:utils"
   },
   "devDependencies": {

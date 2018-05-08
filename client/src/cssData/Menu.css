@@ -1,0 +1,27 @@
+.Home-Link {
+    color : #f06543; !important;
+
+}
+
+.Whole-Navbar {
+    background-color: #2a324b;
+}
+
+ul{
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+li:hover{
+    background-color: #f06543;
+}
+
+a:link {
+    text-decoration: none;
+}
+.Home-Nav {
+    color: #343434;
+    font-size: larger;
+    text-decoration: none;
+}

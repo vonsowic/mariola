@@ -12,4 +12,6 @@ router.use('/faculties', ensureAuthenticated, faculty);
 router.use('/plan', ensureAuthenticated, plan);
 router.use('/exchanges', ensureAuthenticated, exchange);
 
+
+
 module.exports=router;
