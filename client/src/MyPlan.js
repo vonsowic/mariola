@@ -37,7 +37,7 @@ class MyPlan extends Component {
         ];
         return (<BigCalendar
             events={events}
-            views={allViews}
+            views={["week"]}
             step={60}
             showMultiDayTimes
             defaultDate={new Date(2018, 4, 11)}

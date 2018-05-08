@@ -26,9 +26,6 @@ class  UserComp extends Component {
         return(
             <div>
                 {this.state.name + " " + this.state.surname}
-             <ul>
-                 {facs}
-             </ul>
             </div>
         );
     }
