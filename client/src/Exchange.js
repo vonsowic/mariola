@@ -3,6 +3,7 @@ import BigCalendar from 'react-big-calendar'
 import moment from 'moment'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 import axios from 'axios';
+import ExchangeExtViev from "./ExchangeExtViev";
 
 
 BigCalendar.setLocalizer(BigCalendar.momentLocalizer(moment));
@@ -14,7 +15,8 @@ class Exchange extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            baseCourses:[],
+            bAddInfo:false,
+            activeEvent:{},
             courses: []};
 
         //to set timezene
@@ -25,6 +27,7 @@ class Exchange extends Component {
         this.toBigCalFormat = this.toBigCalFormat.bind(this);
         this.checkRangeAndFormat = this.checkRangeAndFormat.bind(this);
         this.force24hFormat = this.force24hFormat.bind(this);
+        this.handleSelectEvent = this.handleSelectEvent.bind(this);
     }
 
     componentDidMount() {
@@ -53,7 +56,10 @@ class Exchange extends Component {
             title: data.name,
             //works only for curr week for  now
             start: tmpStart.toDate(),
-            end: tmpEnd.toDate()
+            end: tmpEnd.toDate(),
+            //additional info
+            group: data.group,
+            dayOfWeek : wday
         }
 
     }
@@ -74,17 +80,29 @@ class Exchange extends Component {
         return intHour
     }
 
-    render() {
+    handleSelectEvent(e) {
+        this.setState({
+            bAddInfo: true,
+            activeEvent: e})
+    }
 
-        return (<BigCalendar
+    render() {
+        const additEl = this.state.bAddInfo ? <ExchangeExtViev data={this.state.activeEvent} changeParSt={(bst) => this.setState({bAddInfo: bst})}/> :
+            <p>Wymiany</p>;
+
+        return (
+        <div>
+            {additEl}
+            <BigCalendar
             events={this.state.courses}
             views={["week","day"]}
             step={30}
             showMultiDayTimes
             defaultDate={new Date(2018, 4, 11)}
             defaultView={"week"}
-            onSelectEvent={(event, e) => console.log(event)}
-        />);
+            onSelectEvent={this.handleSelectEvent}
+        />
+        </div>);
     }
 
 
