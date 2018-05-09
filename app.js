@@ -8,7 +8,7 @@ const app = express();
 
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({extended: false}));
 
 app.use(passport.initialize());
 
@@ -20,4 +20,4 @@ app.use((err, req, res, next) => {
 });
 
 
-module.exports=app;
+module.exports = app;

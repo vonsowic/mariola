@@ -21,8 +21,11 @@ class Menu extends Component {
                     <NavItem eventKey={2}>
                         <Link className="Home-Nav" to="/joinable"> Dołącz </Link>
                     </NavItem>
-                    <NavItem eventKey={2}>
+                    <NavItem eventKey={3}>
                         <Link className="Home-Nav" to="/myplan">Mój plan</Link>
+                    </NavItem>
+                    <NavItem eventKey={4}>
+                        <Link className="Home-Nav" to="/exchanges">Wymiany</Link>
                     </NavItem>
                 </Nav>
                 <Nav pullRight>

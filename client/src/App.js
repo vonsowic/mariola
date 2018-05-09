@@ -11,6 +11,7 @@ import FacultyNew from "./FacultyNew";
 import Home from "./Home";
 import Myplan from "./MyPlan";
 import Menu from "./Menu";
+import Exchange from "./Exchange";
 
 
 class App extends Component {
@@ -49,6 +50,7 @@ class App extends Component {
                         <Route path="/available/new/:id" component={FacultyNew}/>
                         <Route exact path="/login" component={Login}/>
                         <Route exact path="/myplan" component={Myplan}/>
+                        <Route exact path="/exchanges" component={Exchange}/>
                     </Switch>
                 </div>
             </Router>

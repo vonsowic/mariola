@@ -42,6 +42,7 @@ class MyPlan extends Component {
             showMultiDayTimes
             defaultDate={new Date(2018, 4, 11)}
             defaultView={"week"}
+
         />);
     }
 
