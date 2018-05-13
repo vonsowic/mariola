@@ -9,7 +9,7 @@
     "client": "cd client && yarn start",
     "server": "nodemon ./bin/www.js",
     "dev": "concurrently --kill-others-on-fail \"yarn server\" \"yarn client\"",
-    "test": "CLIENT_ID=0 DATABASE_URL=sqlite://mariola-test.db DATABASE_LOGGING=false mocha --timeout 5000 --recursive"
+    "test": "EXPIRATION_TIME_AS_SECONDS=900 CLIENT_ID=0 DATABASE_URL=sqlite://mariola-test.db DATABASE_LOGGING=false mocha --timeout 5000 --recursive"
   },
   "dependencies": {
     "axios": "^0.18.0",

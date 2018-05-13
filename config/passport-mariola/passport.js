@@ -17,26 +17,11 @@ passport.use(new FacebookStrategy({
         let user = await userGetter(profile.id)
 
         if(!user) {
-            user = await createUser(profile, token)
+            await createUser(profile, token)
+            user = await userGetter(profile.id);
         }
 
-        let faculties = user
-            .faculties
-            .reduce((acc, it) =>
-                Object.assign(
-                    acc, {
-                        [it['id']]: it['user_faculty']['isAdmin']
-                    }),
-                {});
-
-
-        done(null, {
-            id: user.id,
-            name: user.name,
-            lastName: user.lastName,
-            fbProfileId: user.fbProfileId,
-            faculties
-        });
+        done(null, user);
     }
 ));
 

@@ -7,7 +7,7 @@ const notifyNewAuthentication = user => {
 
     authenticated.set(
         user.id,
-        setTimeout(() => authenticated.remove(user.id), Number(process.env.EXPIRATION_TIME_AS_SECONDS) * 1000)
+        setTimeout(() => authenticated.delete(user.id), Number(process.env.EXPIRATION_TIME_AS_SECONDS) * 1000)
     );
 
 };

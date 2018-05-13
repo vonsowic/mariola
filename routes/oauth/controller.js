@@ -10,12 +10,12 @@ router.get('/facebook/token',
     passport.authenticate('facebook-token', {session: false}),
     (req, res) => {
         notifyNewAuthentication(req.user);
-        res.json({
+        res.send({
             token: jwt(req.user),
             refreshToken: jsonwebtoken.sign({
                 id: req.user.id,
                 fbProfileId: req.user.fbProfileId
-            }, process.env.JWT_SECRET)
+            }, process.env.JWT_SECRET, {})
         });
     }
 );
@@ -27,18 +27,13 @@ router.get('/token/refresh',
 
         if(user){
             notifyNewAuthentication(user);
-
             res.send({
-                token: jwt(req.user),
-                refreshToken: jsonwebtoken.sign({
-                    id: [req.user.id],
-                    fbProfileId: [req.user.fbProfileId]
-                }).end()
+                token: jwt(user)
             })
         } else {
             res
                 .status(401)
-                .end()
+                .send()
         }
 });
 
