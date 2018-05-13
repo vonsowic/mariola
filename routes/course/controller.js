@@ -1,7 +1,8 @@
 const router = require('express').Router();
 const service = require('./service');
+const ensureFacultyMember = require('utils/guards').ensureFacultyMember;
 
-router.get('/:facultyId/my', (req, res)=>{
+router.get('/:facultyId/my', ensureFacultyMember(), (req, res)=>{
     service.findAllByFaculty(
         req.params.facultyId,
         [
@@ -12,7 +13,7 @@ router.get('/:facultyId/my', (req, res)=>{
 });
 
 
-router.get('/:facultyId/my/general', (req, res)=>{
+router.get('/:facultyId/my/general', ensureFacultyMember(), (req, res)=>{
     service.findAllByFaculty(
         req.params.facultyId,
         [
@@ -22,7 +23,7 @@ router.get('/:facultyId/my/general', (req, res)=>{
 });
 
 
-router.get('/:facultyId', (req, res) => {
+router.get('/:facultyId', ensureFacultyMember(), (req, res) => {
     service.findAllByFaculty(
         req.params.facultyId,
         [
@@ -31,7 +32,7 @@ router.get('/:facultyId', (req, res) => {
         .then(items => res.send(items))
 });
 
-router.get('/:facultyId/general', (req, res, next) => {
+router.get('/:facultyId/general', ensureFacultyMember(), (req, res, next) => {
     service.findWithNumberOfDetailsAndStudents(req.params.facultyId)
         .then(result => res.send(result[0]))
         .catch(err => next(err))

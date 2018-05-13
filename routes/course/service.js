@@ -15,8 +15,8 @@ const findWithNumberOfDetailsAndStudents = facultyId=> db.connection.query(`
             c.id as id, 
             count(cd."courseId") as frequency, 
             extract(dow from cd.start) as dow, 
-            to_char(cd.start, 'HH:MI') as st, 
-            to_char(cd.end, 'HH:MI') as en 
+            to_char(cd.start, 'HH24:MI') as st, 
+            to_char(cd.end, 'HH24:MI') as en 
         FROM courses c 
         JOIN courses_details cd ON c.id=cd."courseId" 
         GROUP BY c.id, "st", "en", "dow"),
