@@ -5,7 +5,6 @@ import Login from './Login';
 import {BrowserRouter as Router, Route, Link, Switch, Redirect} from 'react-router-dom';
 import AvailableFaculties from './AvailableFaculties';
 import JoinableFacs from "./JoinableFacs";
-import UserComp from "./UserComp";
 import JoinIn from "./JoinIn";
 import FacultyNew from "./FacultyNew";
 import Home from "./Home";
@@ -18,9 +17,12 @@ class App extends Component {
 
     constructor(props) {
         super(props);
-        this.state = {logged: false};
+        this.state = {logged: false,
+        course: 1};
         //sets auth header
         Login.setAxios();
+
+        this.handleCourse = this.handleCourse.bind(this)
     }
 
     logged() {
@@ -30,11 +32,19 @@ class App extends Component {
         return false;
     }
 
+    handleCourse(cID) {
+        console.log(cID);
+        this.setState({course: cID});
+    }
+
+
+
+
 
     render() {
         const isLogged = this.logged();
-        const userData = isLogged ? (<UserComp/>) : (<p> Hej! Zaloguj się :)</p>);
-        const menu = isLogged ? (<Menu/>): (<p></p>);
+        const menu = isLogged ? (<Menu setCourse={this.handleCourse}/>): (<p></p>);
+        const exch =   () => <Exchange cId={this.state.course}/>;
         return (
             <Router>
                 <div className="App">
@@ -50,7 +60,7 @@ class App extends Component {
                         <Route path="/available/new/:id" component={FacultyNew}/>
                         <Route exact path="/login" component={Login}/>
                         <Route exact path="/myplan" component={Myplan}/>
-                        <Route exact path="/exchanges" component={Exchange}/>
+                        <Route exact path="/exchanges" render={exch}/>
                     </Switch>
                 </div>
             </Router>

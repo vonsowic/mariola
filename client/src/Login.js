@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import FacebookLogin from "react-facebook-login";
 import axios from 'axios';
 import {withRouter} from 'react-router-dom';
+import Exchange from "./Exchange";
 
 
 class Login extends Component {
@@ -44,7 +45,7 @@ class Login extends Component {
     static setAxios() {
         if (document.cookie.indexOf("access_token") !== -1) {
             axios.defaults.headers.common['Authorization'] = "bearer "
-                + document.cookie.slice(document.cookie.indexOf("access_token") + 13);
+                + Exchange.getCookie("access_token");
         }
     }
 }

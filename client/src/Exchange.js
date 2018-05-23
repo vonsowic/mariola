@@ -17,7 +17,8 @@ class Exchange extends Component {
         this.state = {
             bAddInfo:false,
             activeEvent:{},
-            courses: []};
+            courses: [],
+        cID: this.props.cId};
 
         //to set timezene
         const today   = new Date();
@@ -28,11 +29,31 @@ class Exchange extends Component {
         this.checkRangeAndFormat = this.checkRangeAndFormat.bind(this);
         this.force24hFormat = this.force24hFormat.bind(this);
         this.handleSelectEvent = this.handleSelectEvent.bind(this);
+
+
     }
 
+    static getDerivedStateFromProps(nextProps, prevState) {
+        // Store prevUserId in state so we can compare when props change.
+        // Clear out any previously-loaded user data (so we don't render stale stuff).
+        if (nextProps.cId !== prevState.cID) {
+            return {
+               cID:nextProps.cID,
+                profileOrError: null,
+            };
+        }
+
+        // No state update necessary
+        return null;
+    }
+
+
     componentDidMount() {
-        //hardcoded for now
-        const course = 3;
+        console.log("compoment did mount");
+        const id = Exchange.getCookie("courseID");
+        //defaults to 1
+        const course = id ? id : 1;
+        //const course  = this.props.cId
         axios.get("/api/plan/" + course + "/general")
             .then((res) => {
                // this.setState({courses: res.data});
@@ -42,6 +63,38 @@ class Exchange extends Component {
                 this.setState({courses: fromEvents});
                //  console.log(this.state.courses[2])
             })
+    }
+
+    ComponentDidUpdate(prevProps, prevState) {
+        const course = this.props.cId;
+        axios.get("/api/plan/" + course + "/general")
+            .then((res) => {
+                // this.setState({courses: res.data});
+
+                const fromEvents = res.data.map(this.toBigCalFormat);
+                //  const fromEvents = this.toBigCalFormat(res.data[2]);
+                this.setState({courses: fromEvents,
+                    cID: this.props.cId});
+                //  console.log(this.state.courses[2])
+            });
+
+
+    }
+
+    static  getCookie(cname) {
+        const name = cname + "=";
+        const decodedCookie = decodeURIComponent(document.cookie);
+        const ca = decodedCookie.split(';');
+        for(let i = 0; i <ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) == ' ') {
+                c = c.substring(1);
+            }
+            if (c.indexOf(name) == 0) {
+                return c.substring(name.length, c.length);
+            }
+        }
+        return "";
     }
 
     toBigCalFormat(data) {
@@ -86,9 +139,12 @@ class Exchange extends Component {
             activeEvent: e})
     }
 
+
+
     render() {
         const additEl = this.state.bAddInfo ? <ExchangeExtViev data={this.state.activeEvent} changeParSt={(bst) => this.setState({bAddInfo: bst})}/> :
             <p>Wymiany</p>;
+
 
         return (
         <div>
@@ -98,7 +154,7 @@ class Exchange extends Component {
             views={["week","day"]}
             step={30}
             showMultiDayTimes
-            defaultDate={new Date(2018, 4, 11)}
+            defaultDate={new Date()}
             defaultView={"week"}
             onSelectEvent={this.handleSelectEvent}
         />
