@@ -9,7 +9,6 @@ const course = require('./models/course');
 const triggers = require('./triggers/intention');
 const courseTriggers = require('./triggers/course');
 
-
 const db = new Sequelize(
     process.env.DATABASE_URL,
     Object.assign({
