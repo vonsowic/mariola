@@ -50,6 +50,7 @@ class Menu extends Component {
     }
 
     render() {
+        console.log(document.cookie);
         const userName = this.state.name + " " + this.state.surname;
         let facultiesDrop = this.state.faculties.map((dt) => <MenuItem eventKey={5 + dt.id } key={dt.id}>{dt.name}</MenuItem>);
         return (

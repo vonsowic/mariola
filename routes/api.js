@@ -12,7 +12,7 @@ const ensureNotLogout = guards.ensureNotLogout;
 
 router.use('/oauth', oauth);
 
-router.use(ensureAuthenticated, ensureNotLogout);
+router.use(ensureAuthenticated,ensureNotLogout);
 router.use('/users', users);
 
 router.use('/faculties', faculty);
