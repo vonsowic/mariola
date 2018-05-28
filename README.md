@@ -7,7 +7,7 @@ Required environmental variables:
 * CLIENT_ID=\<FACEBOOK CLIENT ID>
 * CLIENT_SECRET=\<FACEBOOK CLIENT SECRET>
 * DATABASE_URL=\<URL to database(Postgres preferred)>
-* EXPIRATION_TIME_AS_MINUTES=\<ex. 15>
+* EXPIRATION_TIME_AS_SECONDS=\<ex. 15>
 
 Optional environmental variables:
 * DROP_DATABASE=<true/false>
