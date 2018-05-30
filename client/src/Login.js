@@ -7,46 +7,46 @@ import Exchange from "./Exchange";
 
 class Login extends Component {
 
-    render() {
+    constructor(props) {
+        super(props);
+        this.callbackHandler = this.callbackHandler.bind(this);
 
+    }
+    render() {
         return (
             <FacebookLogin
                 appId={process.env.CLIENT_ID}
                 autoLoad={true}
                 fields="name,email,picture"
                 onClick={() => {this.props.history.push("/");}}
-                callback={this.callbackHandler()}
+                callback={this.callbackHandler}
             />
         );
     }
 
-    callbackHandler() {
-        return res => this.authenticateWithApi(res).then(() =>
-            Login.setAxios())
+    callbackHandler(fbResponse) {
+
+        axios.get("/api/oauth/facebook/token?access_token=" + fbResponse.accessToken)
+            .then(res => {
+                console.log('init set token');
+                document.cookie=`access_token=${res.data.token}`;
+                document.cookie=`refresh_token=${res.data.refreshToken}`;
+                Login.setAxios();
+
+            })
 
     }
 
-    authenticateWithApi(fbResponse) {
-        var headers = new Headers();
-        headers.append('Content-Type', 'application/json');
-        headers.append('Accept', 'application/json');
 
-        return fetch(`/api/oauth/facebook/token?access_token=${fbResponse.accessToken}`, {
-            method: 'GET',
-            mode: 'same-origin',
-            redirect: 'follow',
-            credentials: 'include', // Don't forget to specify this if you need cookies
-            headers: headers,
 
-        });
 
-    }
 
-    static setAxios() {
+    static setAxios(cookieName = "access_token") {
         if (document.cookie.indexOf("access_token") !== -1) {
             axios.defaults.headers.common['Authorization'] = "bearer "
-                + Exchange.getCookie("access_token");
+                + Exchange.getCookie(cookieName);
         }
+
     }
 }
 

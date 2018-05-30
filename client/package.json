@@ -5,6 +5,7 @@
   "dependencies": {
     "axios": "^0.18.0",
     "http-proxy-middleware": "^0.18.0",
+    "jwt-decode": "^2.2.0",
     "moment": "^2.22.0",
     "moment-timezone": "^0.5.16",
     "parcel-bundler": "^1.6.2",
