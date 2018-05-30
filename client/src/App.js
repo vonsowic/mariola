@@ -12,71 +12,6 @@ import Myplan from "./MyPlan";
 import Menu from "./Menu";
 import Exchange from "./Exchange";
 import  axios from 'axios';
-import jwt_decode from 'jwt-decode'
-
-// axios.interceptors.response.use(undefined, function (error) {
-//     console.log("401 interceptor");
-//     const orginalRequest = error.config;
-//     if (401 === error.response.status && ! error.config.__isRetryRequest) {
-//         Login.setAxios("refresh_token");
-//         axios.get("/api/oauth/token/refresh").
-//         then(res =>{
-//             if(App.hasToken()) {
-//                 document.cookie = `access_token=${res.data.token}`;
-//                 Login.setAxios();
-//                 error.config.__isRetryRequest = true;
-//                 return axios(orginalRequest)
-//             }else {
-//                this.props.history.push("/login")
-//             }
-//         })
-//
-//     } else {
-//         return Promise.reject(error);
-//     }
-// });f 
-
-// axios.interceptors.request.use(config => {
-//     const orginalRequest  = config;
-//     const url = window.location.href;
-//     console.log('intercepted');
-//     if(url.search('/login') === -1 &&  isOutdated(Exchange.getCookie('access_token'))){
-//         Login.setAxios('refresh_token');
-//         console.log('refreshin gtoken');
-//         axios.get('/api/oauth/token/refresh')
-//             .then(res =>{
-//                 document.cookie = `access_token=${res.data.token}`;
-//                 console.log('token refreshed');
-//                 Login.setAxios();
-//                 return Promise.resolve(orginalRequest);
-//             })
-//     }
-//     return config;
-// });
-
-
-//q2
-// axios.interceptors.request.use((config) => {
-//     let originalRequest = config;
-//     const url = window.location.href;
-//     if (App.hasToken() && isOutdated(Exchange.getCookie('access_token')) && url.search('/login') === -1
-//     &&  originalRequest.url !== '/api/oauth/token/refresh') {
-//         console.log('refreshing');
-//           return issueToken().then((res) => {
-//             console.log(res);
-//             document.cookie = `access_token=${res.data.token}`;
-//             originalRequest['Authorization'] = 'Bearer ' + res.data.token;
-//             Login.setAxios();
-//             return Promise.resolve(originalRequest);
-//         });
-//     }
-//     if(config.url === '/api/oauth/token/refresh'){
-//         config.headers['Authorization'] = 'Bearer ' + Exchange.getCookie('refresh_token');
-//     }
-//         return config;
-// }, (err) => {
-//     return Promise.reject(err);
-// });
 
 
 axios.interceptors.response.use(function (response) {
@@ -102,28 +37,8 @@ axios.interceptors.response.use(function (response) {
     return Promise.reject(error);
 });
 
-function issueToken() {
-    return new Promise((resolve, reject) => {
-        return axios.get('/api/oauth/token/refresh')
-            .then((response) => {
-            resolve(response);
-        }).catch((err) => {
-            reject(err);
-        });
-    });
-}
 
-function isOutdated(JWTtoken) {
-    const decoded = jwt_decode(JWTtoken);
-    const tokenExp = decoded.exp;
-    const currTime = new Date().getTime();
-    if(currTime >= tokenExp * 1000 ){ //cuz shit ain't match
-        console.log('outdated');
-        return true;
-    }
-    return false;
 
-}
 
 class App extends Component {
 
