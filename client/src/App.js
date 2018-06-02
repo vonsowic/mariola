@@ -12,6 +12,7 @@ import Myplan from "./MyPlan";
 import Menu from "./Menu";
 import Exchange from "./Exchange";
 import  axios from 'axios';
+import Sockette from 'sockette'
 
 
 axios.interceptors.response.use(function (response) {
@@ -49,7 +50,22 @@ class App extends Component {
         //sets auth header
         Login.setAxios();
 
-        this.handleCourse = this.handleCourse.bind(this)
+        this.handleCourse = this.handleCourse.bind(this);
+
+        const ws = new Sockette('ws://localhost:5001', {
+            timeout: 5e3,
+            maxAttempts: 10,
+            onopen: e => console.log('Connected!', e),
+            onmessage: e => console.log('Received:', e),
+            onreconnect: e => console.log('Reconnecting...', e),
+            onmaximum: e => console.log('Stop Attempting!', e),
+            onclose: e => console.log('Closed!', e),
+            onerror: e => console.log('Error:', e),
+            protocols: 'echo-protocol'
+        });
+
+
+
     }
 
     static hasToken() {
@@ -64,20 +80,25 @@ class App extends Component {
         this.setState({course: cID});
     }
 
+    handleData(data) {
+        console.log('websocket');
+        console.log(data)
+    }
 
 
     render() {
         const isLogged = App.hasToken();
         const menu = isLogged ? (<Menu setCourse={this.handleCourse}/>): (<p></p>);
-        const exch =   () => <Exchange cId={this.state.course}/>;
+        const exch =  () => <Exchange cId={this.state.course}/>;
         return (
             <Router>
                 <div className="App">
                     <header className="App-header">
                         {menu}
                         <img src={logo} className="App-logo" alt="logo"/>
+
                     </header>
-                    <Switch>
+                    <Switch>    tou
                         <Route exact path="/" render={() => isLogged ? (<Home/>) : (<Redirect to="/login" push/>)}/>
                         <Route exact path="/available" component={AvailableFaculties}/>
                         <Route exact path="/joinable" component={JoinableFacs}/>
