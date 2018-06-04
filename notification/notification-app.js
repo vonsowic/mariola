@@ -5,8 +5,6 @@ const WebSocketServer = require('websocket').server;
 const http = require('http');
 const DBBridge = require('./DatabaseBridge');
 const channels = require('./channels');
-const jwt = require('jsonwebtoken');
-const salt = require('passport-mariola/salt');
 
 
 const facultyRooms = new Map();
@@ -27,9 +25,7 @@ const setConnection = (facultyId, id, connection) => getFaculty(facultyId).set(i
 const handleConnect = (message, connection) => {
     try {
         message = JSON.parse(message.utf8Data);
-        const token = message.token.replace('Bearer ', '');
-        const user = jwt.verify(token, salt());
-        setConnection(message.facultyId, user.id, connection);
+        setConnection(message.facultyId, message.userId, connection);
     } catch(err) {
         connection.send(JSON.stringify({message: 'Unauthorized'}))
     }
