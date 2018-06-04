@@ -13,7 +13,8 @@ import Menu from "./Menu";
 import Exchange from "./Exchange";
 import  axios from 'axios';
 import Sockette from 'sockette'
-
+import * as utils from './utils';
+import {toBigCalFormat} from "./utils";
 
 axios.interceptors.response.use(function (response) {
     return response;
@@ -25,7 +26,7 @@ axios.interceptors.response.use(function (response) {
 
         originalRequest._retry = true;
 
-        const refreshToken = Exchange.getCookie('refresh_token');
+        const refreshToken = utils.getCookie('refresh_token');
         return axios.get('/api/oauth/token/refresh',{ headers: {'Authorization': "bearer " + refreshToken} })
             .then(({data}) => {
                 document.cookie = `access_token=${data.token}`;
@@ -45,18 +46,21 @@ class App extends Component {
 
     constructor(props) {
         super(props);
-        this.state = {logged: false,
-        course: 1};
+        this.state = {
+            logged: false,
+            course: 1,
+            ExchangeData: null
+        };
         //sets auth header
         Login.setAxios();
 
         this.handleCourse = this.handleCourse.bind(this);
-
+        this.handleSocket = this.handleSocket.bind(this);
         const ws = new Sockette('ws://localhost:5001', {
             timeout: 5e3,
             maxAttempts: 10,
             onopen: e => console.log('Connected!', e),
-            onmessage: e => console.log('Received:', e),
+            onmessage: e => this.handleSocket(e),
             onreconnect: e => console.log('Reconnecting...', e),
             onmaximum: e => console.log('Stop Attempting!', e),
             onclose: e => console.log('Closed!', e),
@@ -76,11 +80,15 @@ class App extends Component {
     }
 
     handleCourse(cID) {
-        console.log(cID);
+        console.log('handle course',cID);
         this.setState({course: cID});
+        axios.get("/api/plan/" + cID + "/general")
+            .then((res) => {
+                this.setState({ExchangeData: res.data.map(toBigCalFormat)})
+            });
     }
 
-    handleData(data) {
+    handleSocket(data) {
         console.log('websocket');
         console.log(data)
     }
@@ -88,8 +96,7 @@ class App extends Component {
 
     render() {
         const isLogged = App.hasToken();
-        const menu = isLogged ? (<Menu setCourse={this.handleCourse}/>): (<p></p>);
-        const exch =  () => <Exchange cId={this.state.course}/>;
+        const menu = isLogged ? (<Menu setCourse={this.handleCourse}/>): (<div></div>);
         return (
             <Router>
                 <div className="App">
@@ -106,7 +113,7 @@ class App extends Component {
                         <Route path="/available/new/:id" component={FacultyNew}/>
                         <Route exact path="/login" component={Login}/>
                         <Route exact path="/myplan" component={Myplan}/>
-                        <Route exact path="/exchanges" render={exch}/>
+                        <Route exact path="/exchanges" render={(defProps) => <Exchange cId={this.state.course} data={this.state.ExchangeData} {...defProps}/>} />
                     </Switch>
                 </div>
             </Router>

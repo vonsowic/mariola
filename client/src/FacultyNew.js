@@ -9,11 +9,16 @@ class FacultyNew extends Component {
         this.state = {value: ''};
 
         this.handleSubmit = this.handleSubmit.bind(this);
-        this.handleChange = this.handleChange.bind(this);
+        this.handleName = this.handleName.bind(this);
+        this.handleGroup = this.handleGroup.bind(this);
     }
 
-    handleChange(e) {
+    handleName(e) {
         this.setState({value: e.target.value})
+    }
+
+    handleGroup(e) {
+        this.setState({group: e.target.value})
     }
 
     validateName(name) {
@@ -28,12 +33,14 @@ class FacultyNew extends Component {
 
     handleSubmit(e) {
         const id = this.props.match.params.id;
+        console.log('id', id);
         const nameData = this.state.value;
         if (this.validateName(nameData)) {
             axios.post("/api/faculties/create",
                 {
                     name: nameData,
-                    facultyId: id
+                    facultyId: id,
+                    initialGroup: this.state.group
                 }).then((res) => {
                 if (res.status === 201) {
                     alert("grupa stworzona")
@@ -53,7 +60,9 @@ class FacultyNew extends Component {
             <form onSubmit={this.handleSubmit}>
                 <label>
                     Nazwa nowej grupy:
-                    <input type="text" value={this.state.value} onChange={this.handleChange}/>
+                    <input type="text" value={this.state.value} onChange={this.handleName}/>
+                    bazowa grupa dziekanatowa:
+                    <input type="text" value={this.state.group} onChange={this.handleGroup}/>
                 </label>
                 <input type="submit" value="Submit"/>
             </form>

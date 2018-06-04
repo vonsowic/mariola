@@ -13,7 +13,7 @@ class Menu extends Component {
             surname: '',
             myfaculties: [],
             faculties: []
-        }
+        };
         this.handleSelect = this.handleSelect.bind(this);
     }
 

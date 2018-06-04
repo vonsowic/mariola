@@ -1,7 +1,10 @@
 import React, {Component} from 'react';
 import BigCalendar from 'react-big-calendar'
 import moment from 'moment'
-import 'react-big-calendar/lib/css/react-big-calendar.css'
+import 'react-big-calendar/lib/css/react-big-calendar.css';
+import axios from 'axios';
+import Exchange from "./Exchange";
+
 
 BigCalendar.setLocalizer(BigCalendar.momentLocalizer(moment));
 
@@ -10,7 +13,19 @@ let myView = {MONTH: "month", WEEK: "week",DAY: "day"};
 
 
 class MyPlan extends Component {
+    constructor(props) {
+        super(props);
 
+        this.state = {data: ''}
+    }
+
+    // componentDidMount() {
+    //     const course = getCookie('courseID');
+    //     axios.get('/api/plan/' + course + '/plan/my').
+    //     then(res => {
+    //
+    //     });
+    // }
 
     render() {
         const events = [
