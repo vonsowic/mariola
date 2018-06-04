@@ -21,7 +21,15 @@ export function getCookie(cname) {
         return "";
     }
 
-
+export function toUserPlanFormat(data) {
+    return {
+        id: data.id,
+        title: data.name,
+        start: new Date(data['courses_details.start']),
+        end: new Date(data['courses_details.end']),
+        other: data.other
+    }
+}
 
 export function toBigCalFormat(data) {
     const wday = data.dayOfWeek;

@@ -56,6 +56,7 @@ class App extends Component {
 
         this.handleCourse = this.handleCourse.bind(this);
         this.handleSocket = this.handleSocket.bind(this);
+
         const ws = new Sockette('ws://localhost:5001', {
             timeout: 5e3,
             maxAttempts: 10,
@@ -73,20 +74,25 @@ class App extends Component {
     }
 
     static hasToken() {
-        if (document.cookie.indexOf("access_token") !== -1) {
+        if(document.cookie.indexOf("access_token") !== -1) {
             return true;
         }
         return false;
     }
 
     handleCourse(cID) {
-        console.log('handle course',cID);
         this.setState({course: cID});
-        axios.get("/api/plan/" + cID + "/general")
-            .then((res) => {
-                this.setState({ExchangeData: res.data.map(toBigCalFormat)})
-            });
+            axios.get(`/api/plan/${cID}/general`)
+                .then((res) => {
+                    this.setState({ExchangeData: res.data.map(toBigCalFormat)})
+                });
+
+            axios.get(`api/plan/${cID}/my?start=2017-06-18&end=2019-04-01`)
+                .then(res => this.setState({planData: res.data}))
+
     }
+
+
 
     handleSocket(data) {
         console.log('websocket');
@@ -112,7 +118,7 @@ class App extends Component {
                         <Route path="/joinable/join/:id" component={JoinIn}/>
                         <Route path="/available/new/:id" component={FacultyNew}/>
                         <Route exact path="/login" component={Login}/>
-                        <Route exact path="/myplan" component={Myplan}/>
+                        <Route exact path="/myplan" render={(fdefProps) => <Myplan data={this.state.planData} {...fdefProps}/>}/>
                         <Route exact path="/exchanges" render={(defProps) => <Exchange cId={this.state.course} data={this.state.ExchangeData} {...defProps}/>} />
                     </Switch>
                 </div>

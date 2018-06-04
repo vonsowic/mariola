@@ -3,61 +3,41 @@ import BigCalendar from 'react-big-calendar'
 import moment from 'moment'
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import axios from 'axios';
-import Exchange from "./Exchange";
+import {toUserPlanFormat,getCookie} from "./utils";
 
 
 BigCalendar.setLocalizer(BigCalendar.momentLocalizer(moment));
-
-let allViews = Object.keys(BigCalendar.Views).map(k => BigCalendar.Views[k]);
-let myView = {MONTH: "month", WEEK: "week",DAY: "day"};
 
 
 class MyPlan extends Component {
     constructor(props) {
         super(props);
 
-        this.state = {data: ''}
+        let values = [];
+        if(this.props.data != undefined && this.props.data !== null ) {
+            values = this.props.data.map(toUserPlanFormat);
+        }
+        this.state = {planData: values}
     }
 
-    // componentDidMount() {
-    //     const course = getCookie('courseID');
-    //     axios.get('/api/plan/' + course + '/plan/my').
-    //     then(res => {
-    //
-    //     });
-    // }
+   componentDidMount() {
+       const id = getCookie("courseID");
+        axios.get(`api/plan/${id}/my?start=2017-06-18&end=2019-04-01`)
+            .then(res => this.setState({planData: res.data.map(toUserPlanFormat)}))
+   }
 
     render() {
-        const events = [
-            {
-                id: 0,
-                title: 'Algorytmy',
-                start: new Date(2018, 4, 9, 10, 30, 0, 0),
-                end: new Date(2018, 4, 9, 12, 30, 0, 0),
-            },
-            {
-                id: 1,
-                title: 'Zagadki logiczne',
-                start: new Date(2018, 4, 12, 17, 0, 0, 0),
-                end: new Date(2018, 4, 12, 17, 30, 0, 0),
-                desc: 'ważne!',
-            },
-            {
-                id: 2,
-                title: 'konkurs na najlepszy fikołek',
-                start: new Date(2018, 4, 7, 12, 0, 0, 0),
-                end: new Date(2018, 4, 7, 15, 30, 0, 0),
-                desc: 'ważne!',
-            }
-        ];
-        return (<BigCalendar
-            events={events}
-            views={["week"]}
-            step={60}
-            showMultiDayTimes
-            defaultDate={new Date(2018, 4, 11)}
-            defaultView={"week"}
+        console.log(this.state.planData[0]);
 
+        return (<BigCalendar
+            events={this.state.planData}
+            views={["week"]}
+            step={30}
+            showMultiDayTimes
+            defaultDate={new Date()}
+            defaultView={"week"}
+            min={new Date(2017, 10, 0, 7, 0, 0)}
+            max={new Date(2017, 10, 0, 21, 0, 0)}
         />);
     }
 
