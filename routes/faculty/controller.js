@@ -1,11 +1,9 @@
 const router = require('express').Router();
 const error = require('utils/errors');
-const ensureIsAdmin = require('utils/guards').ensureIsAdmin;
-const ensureFacultyMember = require('utils/guards').ensureFacultyMember;
 const service = require('./service');
 const Recruiter = require('utils/Recruiter');
 const db = require('database');
-const unauthenticate = require('utils/guards').unauthenticate;
+const { ensureIsAdmin, unauthenticate, ensureFacultyMember } = require('utils/guards');
 
 
 router.post('/create', (req, res, next) => {

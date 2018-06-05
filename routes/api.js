@@ -4,11 +4,7 @@ const users = require('./users');
 const plan = require('./course');
 const faculty = require('./faculty');
 const exchange = require('./intention');
-const guards = require('utils/guards');
-
-const ensureAuthenticated = guards.ensureAuthenticated;
-
-const ensureNotLogout = guards.ensureNotLogout;
+const {ensureAuthenticated, ensureNotLogout} = require('utils/guards');
 
 router.use('/oauth', oauth);
 

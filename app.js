@@ -15,7 +15,7 @@ app.use(passport.initialize());
 app.use('/api', api);
 app.use((err, req, res, next) => {
     res
-        .status(err.status)
+        .status(err.status || 500)
         .json({message: err.message})
 });
 

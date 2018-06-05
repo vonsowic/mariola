@@ -9,7 +9,6 @@ const expect = chai.expect;
 const assert = chai.assert;
 
 describe('User test', function () {
-
     describe('GET /api/user/me', function () {
         let user = {
             id: 0,

@@ -3,14 +3,12 @@ const passport = require('passport-mariola');
 const jwt = require('passport-mariola/jwt');
 const salt = require('passport-mariola/salt');
 const jsonwebtoken = require('jsonwebtoken');
-const notifyNewAuthentication = require('utils/guards').notifyNewAuthentication;
 const ensureAuthenticated = require('utils/guards').ensureAuthenticated;
 const userGetter = require('passport-mariola/user-db-getter');
 
 router.get('/facebook/token',
     passport.authenticate('facebook-token', {session: false}),
     (req, res) => {
-        notifyNewAuthentication(req.user);
         res.send({
             token: jwt(req.user),
             refreshToken: jsonwebtoken.sign({
@@ -27,7 +25,6 @@ router.get('/token/refresh',
         const user = await userGetter(req.user.fbProfileId);
 
         if(user){
-            notifyNewAuthentication(user);
             res.send({
                 token: jwt(user)
             })
