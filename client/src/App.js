@@ -54,13 +54,19 @@ const ws = new Sockette('ws://localhost:5001', {
 
 function handleSocketMessage(message) {
     console.log('msg');
+    const token = jwt_decode(getCookie('access_token'));
     const data = JSON.parse(message.data);
     if (data.channel === 'intentioncreated') {
-        notifyMe(`nowa intencja wymiany stowrzona`)
+        //temporary if  different ids mean that we have exhchange match
+        if(data.record.userFrom !== token.id) {
+            notifyMe('udało się wymienić! sprawdż swój plan!')
+        }else{
+            notifyMe('nowa intencja wymiany stowrzona')
+        }
     }else if(data.channel === 'intentionremoved'){
         //not used yet
     }else if(data.channel === 'exchangecreated'){
-        notifyMe('udało się wymienić! odśwież swój plan!')
+        notifyMe('udało się wymienić! sprawdź swój plan!')
     }else{
         console.log('error in socket messages');
     }

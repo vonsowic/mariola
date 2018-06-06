@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import axios from 'axios';
+import "./cssData/ExchangeExtViev.css"
 
 
 class ExchangeExtViev extends Component {
@@ -20,6 +21,7 @@ class ExchangeExtViev extends Component {
     }
     render(){
        const data = this.props.data;
+       console.log(data);
         return(
         <div>
             <p> nazwa: {data.title}<br/>
@@ -28,7 +30,7 @@ class ExchangeExtViev extends Component {
                 od: {data.start.getHours() + ":"  + data.start.getMinutes() + " "}
                 do: {data.end.getHours() + ":"  + data.end.getMinutes()}
             </p>
-            <button onClick={this.handleClick}>Wymień sie!</button>
+            <button className="SubmitBtt" onClick={this.handleClick}>Wymień sie!</button>
         </div>
         );
     }
