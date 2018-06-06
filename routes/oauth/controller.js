@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const passport = require('passport-mariola');
 const jwt = require('passport-mariola/jwt');
+const salt = require('passport-mariola/salt');
 const jsonwebtoken = require('jsonwebtoken');
 const notifyNewAuthentication = require('utils/guards').notifyNewAuthentication;
 const ensureAuthenticated = require('utils/guards').ensureAuthenticated;
@@ -15,7 +16,7 @@ router.get('/facebook/token',
             refreshToken: jsonwebtoken.sign({
                 id: req.user.id,
                 fbProfileId: req.user.fbProfileId
-            }, process.env.JWT_SECRET, {})
+            }, salt(), {})
         });
     }
 );
