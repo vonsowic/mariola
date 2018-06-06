@@ -138,6 +138,7 @@ class App extends Component {
                     <Switch>
                         <Route exact path="/" render={() => isLogged ? (<Home/>) : (<Redirect to="/login" push/>)}/>
                         <Route exact path="/available" component={AvailableFaculties}/>
+                        <Route exact path="/home" component={Home}/>
                         <Route exact path="/joinable" component={JoinableFacs}/>
                         <Route path="/joinable/join/:id" component={JoinIn}/>
                         <Route path="/available/new/:id" component={FacultyNew}/>

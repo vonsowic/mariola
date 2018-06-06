@@ -22,7 +22,7 @@ class Login extends Component {
                 appId={process.env.CLIENT_ID}
                 autoLoad={true}
                 fields="name,email,picture"
-                onClick={() => {this.props.history.push("/");}}
+                onClick={() => {this.props.history.push("/home");}}
                 callback={this.callbackHandler}
             />
         );
