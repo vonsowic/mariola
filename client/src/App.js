@@ -11,7 +11,7 @@ import Home from "./Home";
 import Myplan from "./MyPlan";
 import Menu from "./Menu";
 import Exchange from "./Exchange";
-import  axios from 'axios';
+import axios from 'axios';
 import Sockette from 'sockette'
 import * as utils from './utils';
 import {toBigCalFormat} from "./utils";
@@ -29,7 +29,7 @@ axios.interceptors.response.use(function (response) {
         originalRequest._retry = true;
 
         const refreshToken = utils.getCookie('refresh_token');
-        return axios.get('/api/oauth/token/refresh',{ headers: {'Authorization': "bearer " + refreshToken} })
+        return axios.get('/api/oauth/token/refresh', {headers: {'Authorization': "bearer " + refreshToken}})
             .then(({data}) => {
                 document.cookie = `access_token=${data.token}`;
                 axios.defaults.headers.common['Authorization'] = 'Bearer ' + data.token;
@@ -61,11 +61,11 @@ function handleSocketMessage(data) {
 function handleSocketConn(evnt) {
     const token = getCookie('access_token');
     const decoded = jwt_decode(token);
-        ws.json({
-            userId: decoded.id,
-            facultyIds: Object.keys(decoded.faculties)
-        });
-    setTimeout(handleSocketConn,1000);
+    ws.json({
+        userId: decoded.id,
+        facultyIds: Object.keys(decoded.faculties)
+    });
+    setTimeout(handleSocketConn, 1000);
 
 }
 
@@ -85,13 +85,10 @@ class App extends Component {
         this.handleCourse = this.handleCourse.bind(this);
 
 
-
-
-
     }
 
     static hasToken() {
-        if(document.cookie.indexOf("access_token") !== -1) {
+        if (document.cookie.indexOf("access_token") !== -1) {
             return true;
         }
         return false;
@@ -99,24 +96,20 @@ class App extends Component {
 
     handleCourse(cID) {
         this.setState({course: cID});
-            axios.get(`/api/plan/${cID}/general`)
-                .then((res) => {
-                    this.setState({ExchangeData: res.data.map(toBigCalFormat)})
-                });
+        axios.get(`/api/plan/${cID}/general`)
+            .then((res) => {
+                this.setState({ExchangeData: res.data.map(toBigCalFormat)})
+            });
 
-            axios.get(`api/plan/${cID}/my?start=2017-06-18&end=2019-04-01`)
-                .then(res => this.setState({planData: res.data}))
+        axios.get(`api/plan/${cID}/my?start=2017-06-18&end=2019-04-01`)
+            .then(res => this.setState({planData: res.data}))
 
     }
 
 
-
-
-
-
     render() {
         const isLogged = App.hasToken();
-        const menu = isLogged ? (<Menu setCourse={this.handleCourse}/>): (<div></div>);
+        const menu = isLogged ? (<Menu setCourse={this.handleCourse}/>) : (<div></div>);
         return (
             <Router>
                 <div className="App">
@@ -125,15 +118,17 @@ class App extends Component {
                         <img src={logo} className="App-logo" alt="logo"/>
 
                     </header>
-                    <Switch>    tou
+                    <Switch> tou
                         <Route exact path="/" render={() => isLogged ? (<Home/>) : (<Redirect to="/login" push/>)}/>
                         <Route exact path="/available" component={AvailableFaculties}/>
                         <Route exact path="/joinable" component={JoinableFacs}/>
                         <Route path="/joinable/join/:id" component={JoinIn}/>
                         <Route path="/available/new/:id" component={FacultyNew}/>
                         <Route exact path="/login" component={Login}/>
-                        <Route exact path="/myplan" render={(fdefProps) => <Myplan data={this.state.planData} {...fdefProps}/>}/>
-                        <Route exact path="/exchanges" render={(defProps) => <Exchange cId={this.state.course} data={this.state.ExchangeData} {...defProps}/>} />
+                        <Route exact path="/myplan"
+                               render={(fdefProps) => <Myplan data={this.state.planData} {...fdefProps}/>}/>
+                        <Route exact path="/exchanges" render={(defProps) => <Exchange cId={this.state.course}
+                                                                                       data={this.state.ExchangeData} {...defProps}/>}/>
                     </Switch>
                 </div>
             </Router>
