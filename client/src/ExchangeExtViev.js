@@ -22,13 +22,17 @@ class ExchangeExtViev extends Component {
     render(){
        const data = this.props.data;
        console.log(data);
+        const baseStartMins = data.start.getMinutes();
+        const startMinutes = baseStartMins  < 10 ? baseStartMins + '0' : baseStartMins;
+        const baseEndMins = data.end.getMinutes();
+        const endMinutes = baseEndMins  < 10 ? baseEndMins + '0' : baseEndMins;
         return(
         <div>
             <p> nazwa: {data.title}<br/>
                 grupa bazowa: {data.group}<br/>
                 dzień: {this.convertDay(data.dayOfWeek)} <br/>
-                od: {data.start.getHours() + ":"  + data.start.getMinutes() + " "}
-                do: {data.end.getHours() + ":"  + data.end.getMinutes()}
+                od: {data.start.getHours() + ":"  + startMinutes + " "}
+                do: {data.end.getHours() + ":"  + endMinutes}
             </p>
             <button className="SubmitBtt" onClick={this.handleClick}>Wymień sie!</button>
         </div>
