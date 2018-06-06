@@ -11,6 +11,10 @@ class Login extends Component {
         super(props);
         this.callbackHandler = this.callbackHandler.bind(this);
 
+        Notification.requestPermission().then(function(result) {
+            document.cookie =`notification_perm=${result}`
+        });
+
     }
     render() {
         return (

@@ -15,6 +15,8 @@ import  axios from 'axios';
 import Sockette from 'sockette'
 import * as utils from './utils';
 import {toBigCalFormat} from "./utils";
+import jwt_decode from 'jwt-decode';
+import {getCookie} from "./utils";
 
 axios.interceptors.response.use(function (response) {
     return response;
@@ -39,7 +41,33 @@ axios.interceptors.response.use(function (response) {
     return Promise.reject(error);
 });
 
+const ws = new Sockette('ws://localhost:5001', {
+    timeout: 5e3,
+    maxAttempts: 10,
+    onopen: e => handleSocketConn(e),
+    onmessage: e => handleSocketMessage(e),
+    onreconnect: e => console.log('Reconnecting...', e),
+    onmaximum: e => console.log('Stop Attempting!', e),
+    onclose: e => console.log('Closed!', e),
+    onerror: e => console.log('Error:', e),
+    protocols: 'echo-protocol'
+});
 
+function handleSocketMessage(data) {
+    console.log('msg');
+    console.log(data)
+}
+
+function handleSocketConn(evnt) {
+    const token = getCookie('access_token');
+    const decoded = jwt_decode(token);
+        ws.json({
+            userId: decoded.id,
+            facultyIds: Object.keys(decoded.faculties)
+        });
+    setTimeout(handleSocketConn,1000);
+
+}
 
 
 class App extends Component {
@@ -55,19 +83,8 @@ class App extends Component {
         Login.setAxios();
 
         this.handleCourse = this.handleCourse.bind(this);
-        this.handleSocket = this.handleSocket.bind(this);
 
-        const ws = new Sockette('ws://localhost:5001', {
-            timeout: 5e3,
-            maxAttempts: 10,
-            onopen: e => console.log('Connected!', e),
-            onmessage: e => this.handleSocket(e),
-            onreconnect: e => console.log('Reconnecting...', e),
-            onmaximum: e => console.log('Stop Attempting!', e),
-            onclose: e => console.log('Closed!', e),
-            onerror: e => console.log('Error:', e),
-            protocols: 'echo-protocol'
-        });
+
 
 
 
@@ -94,10 +111,7 @@ class App extends Component {
 
 
 
-    handleSocket(data) {
-        console.log('websocket');
-        console.log(data)
-    }
+
 
 
     render() {

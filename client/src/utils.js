@@ -72,3 +72,25 @@ function force24hFormat(intHour) {
     return intHour
 }
 
+function notifyMe(notif) {
+    // Let's check if the browser supports notifications
+    if (!("Notification" in window)) {
+        alert("This browser does not support system notifications");
+    }
+
+    // Let's check whether notification permissions have already been granted
+    else if (getCookie('notification_perm') === "granted") {
+        // If it's okay let's create a notification
+        var notification = new Notification(notif);
+    }
+
+    // Otherwise, we need to ask the user for permission
+    else if (Notification.permission !== 'denied') {
+        Notification.requestPermission(function (permission) {
+            // If the user accepts, let's create a notification
+            if (permission === "granted") {
+                var notification = new Notification(notif);
+            }
+        });
+    }
+}

@@ -23,7 +23,7 @@ class Menu extends Component {
         }
 
         function getFaculties() {
-            return axios.get("/api/faculties?onlyMy?=true")
+            return axios.get("/api/faculties?onlyMy=true")
         }
 
         axios.all([getUser(), getFaculties()])
