@@ -1,11 +1,9 @@
 const router = require('express').Router();
 const error = require('utils/errors');
-const ensureIsAdmin = require('utils/guards').ensureIsAdmin;
-const ensureFacultyMember = require('utils/guards').ensureFacultyMember;
 const service = require('./service');
 const Recruiter = require('utils/Recruiter');
 const db = require('database');
-const unauthenticate = require('utils/guards').unauthenticate;
+const { ensureIsAdmin, unauthenticate, ensureFacultyMember } = require('utils/guards');
 
 
 router.post('/create', (req, res, next) => {
@@ -24,21 +22,14 @@ router.post('/create', (req, res, next) => {
 
 
 router.get('/', (req, res) => {
-    db.Faculty
-        .findAll({
-            attributes: ['id', 'name'],
-            include: [{
-                model: db.User,
-                attributes: [],
-                required: req.query.onlyMy === 'true',
-                through: {
-                    model: db.UserFaculty,
-                    where: { userId: req.user.id },
-                    attributes: [],
-                }
-            }]
-        })
-        .then(result => res.send(result))
+    db.connection.query(`
+        SELECT id, name
+        FROM faculties 
+        ${req.query.onlyMy !== 'true' 
+        ? ''
+        : `WHERE id IN (SELECT "facultyId" FROM user_faculties WHERE "userId"=${req.user.id})`}
+    ;`)
+        .then(result => res.send(result[0]))
 });
 
 

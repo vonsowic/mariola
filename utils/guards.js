@@ -1,23 +1,18 @@
 const passport = require('passport-mariola');
 
-const authenticated = new Map;
 
-const notifyNewAuthentication = user => {
-    clearTimeout(authenticated.get(user.id));
+const blacklistedDecryptedTokens = new Set;
 
-    authenticated.set(
-        user.id,
-        setTimeout(() => authenticated.delete(user.id), Number(process.env.EXPIRATION_TIME_AS_SECONDS) * 1000)
-    );
-
-};
 
 const unauthenticate = user => {
-    clearTimeout(authenticated.get(user.id));
-    authenticated.delete(user.id)
+    const encryptedUser = encryptUser(user);
+    blacklistedDecryptedTokens.add(encryptedUser);
+    setTimeout((user.exp - user.iat) * 1000, () => blacklistedDecryptedTokens.remove(encryptedUser))
 };
 
-const ensureAuthenticated = passport.authenticate('jwt', {session: false});
+
+const encryptUser = ({id, iat, exp}) => JSON.stringify({id, iat, exp});
+
 
 const ensureFacultyMember = (idGetter=defaultIdGetter) => (req, res, next) => {
     if(idGetter(req) in req.user.faculties){
@@ -27,6 +22,9 @@ const ensureFacultyMember = (idGetter=defaultIdGetter) => (req, res, next) => {
     }
 };
 
+const ensureAuthenticated = passport.authenticate('jwt', {session: false})
+
+
 const ensureIsAdmin = (idGetter=defaultIdGetter) => (req, res, next) => {
     if(req.user.faculties[idGetter(req)]){
         next()
@@ -35,8 +33,9 @@ const ensureIsAdmin = (idGetter=defaultIdGetter) => (req, res, next) => {
     }
 };
 
+
 const ensureNotLogout = (req, res, next) => {
-    if( authenticated.has(req.user.id) ){
+    if( !blacklistedDecryptedTokens.has(encryptUser(req.user)) ){
         next()
     } else {
         res
@@ -45,13 +44,14 @@ const ensureNotLogout = (req, res, next) => {
     }
 };
 
+
 const defaultIdGetter = req => req.params.facultyId || req.body.facultyId;
+
 
 module.exports={
     ensureAuthenticated,
     ensureFacultyMember,
     ensureIsAdmin,
     ensureNotLogout,
-    notifyNewAuthentication,
     unauthenticate
 };

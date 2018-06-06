@@ -1,0 +1,1 @@
+module.exports = () => process.env.RUN_AS || process.env.RUN_AS === '0';

@@ -1,39 +1,29 @@
 const passport = require('passport');
 const FacebookStrategy = require('passport-facebook-token');
-const passportJWT = require('passport-jwt');
-const getJwtSecret = require('./salt');
 const db = require('database');
 const userGetter = require('./user-db-getter');
+const isTestMode = require('utils/is-test-mode');
 
-const ExtractJWT = passportJWT.ExtractJwt;
-const JWTStrategy   = passportJWT.Strategy;
-
+const Strategy = isTestMode()
+    ? require('./PassportTestingStrategy')
+    : require('./JWTStrategy');
 
 passport.use(new FacebookStrategy({
         clientID: process.env.CLIENT_ID,
         clientSecret: process.env.CLIENT_SECRET
     },
     async (token, refreshToken, profile, done) => {
-        let user = await userGetter(profile.id)
+        let user = await userGetter(profile.id);
 
         if(!user) {
-            await createUser(profile, token)
-            user = await userGetter(profile.id);
+            user = await createUser(profile, token);
         }
 
         done(null, user);
     }
 ));
 
-
-passport.use(new JWTStrategy({
-        jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
-        secretOrKey: getJwtSecret()
-    },
-    (jwtPayload, done) => {
-        done(null, jwtPayload);
-    }
-));
+passport.use('jwt', new Strategy());
 
 
 function createUser(profile, token) {
@@ -45,6 +35,5 @@ function createUser(profile, token) {
         accessToken: token
     })
 }
-
 
 module.exports = passport;

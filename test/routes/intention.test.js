@@ -23,7 +23,7 @@ describe('Intention and exchanges test', function () {
         db = await dbhelper.initializeDatabase();
         faculty= await dbhelper.createFaculty('Informatyka');
 
-        tester = await dbhelper.createUserInFaculty(faculty.id);
+        tester = await dbhelper.createUserInFaculty(faculty.id, 'name', 'lasnname', 1);
         token = jwt(tester);
         user = await dbhelper.createUserInFaculty(faculty.id);
 

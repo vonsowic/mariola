@@ -16,5 +16,6 @@ Optional environmental variables:
 * PORT=<default 3000>
 * API_PORT=<default 5000>
 * NOTIFICATION_PORT=<default 5001>
+* RUN_AS=\<ONLY FOR TESTS! Facebook id of user who will be used in all callbacks>
 
 And start developing with `npm run dev `
