@@ -7,7 +7,7 @@ router.get('/:facultyId', ensureFacultyMember(), (req, res) => {
         .then(exchanges => res.send(exchanges))
 });
 
-router.post('/', ensureFacultyMember(), (req, res, next) => {
+router.post('/', /*ensureFacultyMember(),*/ (req, res, next) => {
     service.create(req.body.forId, req.user.id)
         .then(ex => res.send({id: ex.id}))
         .catch(err => next(err))
@@ -21,7 +21,7 @@ router.post('/specific', ensureFacultyMember(), (req, res, next) => {
         .catch(err => next(err))
 });
 
-router.delete('/:intentionId', ensureFacultyMember(), (req, res, next) => {
+router.delete('/:intentionId', /*ensureFacultyMember(),*/ (req, res, next) => {
     service.remove(req.params.intentionId)
         .then(() => res
             .status(204)

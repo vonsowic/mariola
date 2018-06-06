@@ -30,6 +30,7 @@ const createFaculty = async (name, availableFacultyId, userId, initialGroup) => 
     await Recruiter.begin()
         .withUser(userId)
         .toFaculty(createdFaculty.id)
+        .asAdmin()
         .inGroup(initialGroup)
         .end();
 

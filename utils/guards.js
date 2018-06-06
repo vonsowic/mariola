@@ -7,7 +7,7 @@ const blacklistedDecryptedTokens = new Set;
 const unauthenticate = user => {
     const encryptedUser = encryptUser(user);
     blacklistedDecryptedTokens.add(encryptedUser);
-    setTimeout((user.exp - user.iat) * 1000, () => blacklistedDecryptedTokens.remove(encryptedUser))
+    // setTimeout(() => blacklistedDecryptedTokens.remove(encryptedUser), (user.exp - user.iat) * 1000)
 };
 
 

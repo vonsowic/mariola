@@ -21,13 +21,13 @@ const getFaculty = id => {
 };
 
 const setConnection = ({facultyIds, userId}, connection) =>
-    facultyIds.forEach(fid => getFaculty(fid).set(id, connection));
+    facultyIds.forEach(fid => getFaculty(fid).set(userId, connection));
 
 const handleConnect = (message, connection) => {
     try {
         setConnection(JSON.parse(message.utf8Data), connection);
     } catch(err) {
-        connection.send(JSON.stringify({message: 'Unauthorized'}))
+        connection.send('Error')
     }
 };
 
@@ -49,6 +49,7 @@ const wsServer = new WebSocketServer({
 
 
 wsServer.on('request', request => {
+    console.log(`New client`)
     if (!originIsAllowed(request.origin)) {
         request.reject();
         return;
@@ -101,3 +102,5 @@ module.exports= port => {
 
     return server
 };
+
+// module.exports(5001)
