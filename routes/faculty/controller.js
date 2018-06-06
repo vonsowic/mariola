@@ -22,21 +22,14 @@ router.post('/create', (req, res, next) => {
 
 
 router.get('/', (req, res) => {
-    db.Faculty
-        .findAll({
-            attributes: ['id', 'name'],
-            include: [{
-                model: db.User,
-                attributes: [],
-                required: req.query.onlyMy === 'true',
-                through: {
-                    model: db.UserFaculty,
-                    where: { userId: req.user.id },
-                    attributes: [],
-                }
-            }]
-        })
-        .then(result => res.send(result))
+    db.connection.query(`
+        SELECT id, name
+        FROM faculties 
+        ${req.query.onlyMy !== 'true' 
+        ? ''
+        : `WHERE id IN (SELECT "facultyId" FROM user_faculties WHERE "userId"=${req.user.id})`}
+    ;`)
+        .then(result => res.send(result[0]))
 });
 
 
