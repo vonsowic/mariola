@@ -20,12 +20,12 @@ const getFaculty = id => {
     return faculty
 };
 
-const setConnection = (facultyId, id, connection) => getFaculty(facultyId).set(id, connection);
+const setConnection = ({facultyIds, userId}, connection) =>
+    facultyIds.forEach(fid => getFaculty(fid).set(id, connection));
 
 const handleConnect = (message, connection) => {
     try {
-        message = JSON.parse(message.utf8Data);
-        setConnection(message.facultyId, message.userId, connection);
+        setConnection(JSON.parse(message.utf8Data), connection);
     } catch(err) {
         connection.send(JSON.stringify({message: 'Unauthorized'}))
     }
@@ -69,7 +69,7 @@ const createMessage = (channel, record) =>
         record
     });
 
-const sendToEachChannel = channel => record => {
+const sendToEachOnChannel = channel => record => {
     getFaculty(record.facultyId)
         .forEach(conn => conn.send(createMessage(channel, record)))
 };
@@ -89,8 +89,8 @@ const onNewExchangeListener = record => {
 };
 
 new DBBridge()
-    .setListenerOn(channels.INTENTION_CREATED, sendToEachChannel(channels.INTENTION_CREATED))
-    .setListenerOn(channels.INTENTION_REMOVED, sendToEachChannel(channels.INTENTION_REMOVED))
+    .setListenerOn(channels.INTENTION_CREATED, sendToEachOnChannel(channels.INTENTION_CREATED))
+    .setListenerOn(channels.INTENTION_REMOVED, sendToEachOnChannel(channels.INTENTION_REMOVED))
     .setListenerOn(channels.EXCHANGE_CREATED, onNewExchangeListener);
 
 module.exports= port => {
