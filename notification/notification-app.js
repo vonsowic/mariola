@@ -21,10 +21,11 @@ const getFaculty = id => {
 };
 
 const setConnection = ({facultyIds, userId}, connection) =>
-    facultyIds.forEach(fid => getFaculty(fid).set(userId, connection));
+    facultyIds.forEach(fid => getFaculty(Number(fid)).set(userId, connection));
 
 const handleConnect = (message, connection) => {
     try {
+        console.log('Message: ' + message.utf8Data);
         setConnection(JSON.parse(message.utf8Data), connection);
     } catch(err) {
         connection.send('Error')
