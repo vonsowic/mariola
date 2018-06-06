@@ -1,0 +1,23 @@
+.SelectC {
+    width: 15%;
+    background-color:#fcfcfc;
+    font-size: large;
+    border-radius: 7px;
+
+}
+.SubmitBtt{
+    width: 15%;
+    background-color: #2a324b;
+    font-size: large;
+    border-radius: 7px;
+    color: #fcfcfc
+}
+.SelectC option {
+    font-size: large;
+
+}
+
+
+.SubmitBtt:hover {
+    background-color : #f06543;
+}

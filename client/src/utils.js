@@ -72,7 +72,7 @@ function force24hFormat(intHour) {
     return intHour
 }
 
-function notifyMe(notif) {
+export function notifyMe(notif) {
     // Let's check if the browser supports notifications
     if (!("Notification" in window)) {
         alert("This browser does not support system notifications");

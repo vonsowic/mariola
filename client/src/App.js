@@ -13,10 +13,9 @@ import Menu from "./Menu";
 import Exchange from "./Exchange";
 import axios from 'axios';
 import Sockette from 'sockette'
-import * as utils from './utils';
-import {toBigCalFormat} from "./utils";
+import {toBigCalFormat,getCookie,notifyMe} from "./utils";
 import jwt_decode from 'jwt-decode';
-import {getCookie} from "./utils";
+
 
 axios.interceptors.response.use(function (response) {
     return response;
@@ -28,7 +27,7 @@ axios.interceptors.response.use(function (response) {
 
         originalRequest._retry = true;
 
-        const refreshToken = utils.getCookie('refresh_token');
+        const refreshToken = getCookie('refresh_token');
         return axios.get('/api/oauth/token/refresh', {headers: {'Authorization': "bearer " + refreshToken}})
             .then(({data}) => {
                 document.cookie = `access_token=${data.token}`;
@@ -53,9 +52,21 @@ const ws = new Sockette('ws://localhost:5001', {
     protocols: 'echo-protocol'
 });
 
-function handleSocketMessage(data) {
+function handleSocketMessage(message) {
     console.log('msg');
-    console.log(data)
+    const data = JSON.parse(message.data);
+    if (data.channel === 'intentioncreated') {
+        notifyMe(`nowa intencja wymiany stowrzona`)
+    }else if(data.channel === 'intentionremoved'){
+        //not used yet
+    }else if(data.channel === 'exchangecreated'){
+        notifyMe('udało się wymienić! odśwież swój plan!')
+    }else{
+        console.log('error in socket messages');
+    }
+
+    console.log(message);
+    console.log(data);
 }
 
 function handleSocketConn(evnt) {
@@ -118,7 +129,7 @@ class App extends Component {
                         <img src={logo} className="App-logo" alt="logo"/>
 
                     </header>
-                    <Switch> tou
+                    <Switch>
                         <Route exact path="/" render={() => isLogged ? (<Home/>) : (<Redirect to="/login" push/>)}/>
                         <Route exact path="/available" component={AvailableFaculties}/>
                         <Route exact path="/joinable" component={JoinableFacs}/>

@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import axios from 'axios';
 import {Link} from 'react-router-dom';
-
+import "./cssData/FacultyNew.css"
 
 class FacultyNew extends Component {
     constructor(props) {
@@ -60,11 +60,17 @@ class FacultyNew extends Component {
             <form onSubmit={this.handleSubmit}>
                 <label>
                     Nazwa nowej grupy:
-                    <input type="text" value={this.state.value} onChange={this.handleName}/>
-                    bazowa grupa dziekanatowa:
-                    <input type="text" value={this.state.group} onChange={this.handleGroup}/>
                 </label>
-                <input type="submit" value="Submit"/>
+                <br/>
+                    <input type="text" value={this.state.value} onChange={this.handleName}/>
+                <br/>
+                <label>
+                bazowa grupa dziekanatowa:
+                </label>
+                <br/>
+                    <input type="text" value={this.state.group} onChange={this.handleGroup}/>
+                <br/> <br/>
+                <input className="SubmitBtt" type="submit" value="Stwórz"/>
             </form>
         );
 

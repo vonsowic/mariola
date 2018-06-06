@@ -35,12 +35,14 @@ class DatabaseBridge {
         await this._createTrigger(channels.EXCHANGE_CREATED, 'exchanges', 'after insert');
     }
 
+//select name, start ,"courses_details".end from courses join courses_details on (courses.id="courses_details"."courseId") where courses.id=41 limit 1
     _createTrigger(channel, tableName, eventType){
         const record = eventType.includes("delete") ? 'OLD' : 'NEW';
         return this._client.query(`
             CREATE OR REPLACE FUNCTION notification${channel}() RETURNS TRIGGER AS $$
                 DECLARE
                     fid INTEGER;
+                    details RECORD;
                 BEGIN
                     SELECT "facultyId" 
                     INTO fid
@@ -48,9 +50,12 @@ class DatabaseBridge {
                     WHERE id=${record}."whatId"
                     LIMIT 1;
                     
+ 
+                    
                     PERFORM pg_notify(
                         '${channel}', 
                         (row_to_json(${record})::jsonb || jsonb ('{"facultyId": ' || fid || '}'))::text
+                        
                     );
                     
                     RETURN null;

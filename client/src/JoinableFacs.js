@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import './cssData/joinableFacs.css'
 
 
 class JoinableFacs extends Component {
@@ -16,7 +17,7 @@ class JoinableFacs extends Component {
 
     render(){
         const serverData = this.state.data;
-        const renderThis = serverData.map((el) => <li key={el.id}> <Link to={"/joinable/join/" + el.id}> {el.name} </Link> </li>);
+        const renderThis = serverData.map((el) => <li key={el.id}> <Link className="JoinLink" to={"/joinable/join/" + el.id}> {el.name} </Link> </li>);
         return (
             <ul>
                 {renderThis}

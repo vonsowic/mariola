@@ -25,7 +25,6 @@ const setConnection = ({facultyIds, userId}, connection) =>
 
 const handleConnect = (message, connection) => {
     try {
-        console.log('Message: ' + message.utf8Data);
         setConnection(JSON.parse(message.utf8Data), connection);
     } catch(err) {
         connection.send('Error')
@@ -50,7 +49,7 @@ const wsServer = new WebSocketServer({
 
 
 wsServer.on('request', request => {
-    console.log(`New client`)
+    console.log(`New client`);
     if (!originIsAllowed(request.origin)) {
         request.reject();
         return;
