@@ -4,6 +4,7 @@ import {Link} from 'react-router-dom';
 
 
 class JoinIn extends Component {
+
     constructor(props) {
         super(props);
         this.state = {value: ''};
@@ -33,7 +34,12 @@ class JoinIn extends Component {
             else {
                 alert("spróbuj ponownie")
             }
-        }).catch((err => console.log(err)));
+        }).catch(err => {
+            console.log('error: ', err.response);
+            if(err.response.status === 409){
+                alert('jesteś już członkiem grupu lub grupa nie istnieje')
+            }
+        });
 
         e.preventDefault();
 

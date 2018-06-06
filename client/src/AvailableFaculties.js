@@ -9,9 +9,7 @@ class AvailableFaculties extends  Component {
     }
     componentDidMount(){
          axios.get('api/faculties/available').
-         then((resp) => {this.setState({faculties: resp.data})}).
-         catch((err) => {console.log(err);
-         this.nextPath("/")});
+         then((resp) => {this.setState({faculties: resp.data})})
 
     }
     render(){

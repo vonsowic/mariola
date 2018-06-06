@@ -8,7 +8,7 @@ const {ensureAuthenticated, ensureNotLogout} = require('utils/guards');
 
 router.use('/oauth', oauth);
 
-router.use(ensureAuthenticated, ensureNotLogout);
+router.use(ensureAuthenticated,ensureNotLogout);
 router.use('/users', users);
 
 router.use('/faculties', faculty);

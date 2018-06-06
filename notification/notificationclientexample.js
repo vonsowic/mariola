@@ -32,7 +32,7 @@ client.on('connect', function(connection) {
             setTimeout(sendToken, 1000);
         }
     }
-    sendToken()
+
 });
 
 

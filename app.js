@@ -8,16 +8,17 @@ const app = express();
 
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({extended: false}));
 
 app.use(passport.initialize());
 
 app.use('/api', api);
 app.use((err, req, res, next) => {
+
     res
         .status(err.status || 500)
         .json({message: err.message})
 });
 
 
-module.exports=app;
+module.exports = app;
