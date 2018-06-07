@@ -16,7 +16,13 @@ class ExchangeExtViev extends Component {
         axios.post("/api/exchanges",{
                 forId: this.props.data.id
         }).then((r) => {console.log("this id: ",this.props.data.id);
-        this.props.changeParSt(false)});
+        this.props.changeParSt(false)})
+            .catch(err => {
+            console.log('error: ', err.response);
+            if(err.response.status === 409){
+                alert('intencja wymiany już istnieje!')
+            }
+        });
         e.preventDefault()
     }
     render(){
