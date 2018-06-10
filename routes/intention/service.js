@@ -1,22 +1,32 @@
 const db = require('database');
+const {NotFound} = require('utils/errors')
+
 
 const findAllIntentionsByFacultyId = facultyId =>
-    db.connection.query(`
+    db.connection.query(
+        buildSelectRequest(`c_what."facultyId"=${facultyId}`),
+        { include: [{ model: db.Course }] })
+        .then(res => res[0]);
+
+const findOneIntentionById = (facultyId, intentionId) =>
+    db.connection.query(
+        buildSelectRequest(`ei.id=${intentionId} AND c_what."facultyId"=${facultyId}`),
+        { include: [{ model: db.Course }] })
+        .then(res => res[0][0] || (() => {throw new NotFound('Intention does not exist')})());
+
+const buildSelectRequest = where => `
         SELECT  
             ei.id, 
             c_what.name AS "course",
-            u_from.name AS "userName", u_from."lastName" AS "userLastName",
+            u_from.id as "userId", u_from.name AS "userName", u_from."lastName" AS "userLastName",
             c_what.id AS "whatId", c_what.group AS "whatGroup",
-            c_for.id AS "forId", c_for.group AS "forGroup"
+            c_for.id AS "forId", c_for.group AS "forGroup",
+            ei."createdAt"
         FROM exchange_intentions ei 
         JOIN users u_from ON ei."userFrom"=u_from.id 
         JOIN courses c_what ON c_what.id=ei."whatId" 
         JOIN courses c_for ON c_for.id=ei."forId" 
-        WHERE c_what."facultyId"=${facultyId};
-`, { include: [{ model: db.Course }] })
-        .then(res => res[0]);
-
-
+        WHERE ${where} ;`;
 
 const create = (forId, userFrom) =>
     db.ExchangeIntention
@@ -45,6 +55,7 @@ const remove = intentionId =>
 
 module.exports={
     findAllIntentionsByFacultyId,
+    findOneIntentionById,
     create,
     exchange,
     remove

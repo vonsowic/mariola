@@ -9,6 +9,7 @@ client.on('connectFailed', (error) => {
 
 client.on('connect', function(connection) {
     console.log('WebSocket Client Connected');
+
     connection.on('error', function(error) {
         console.log("Connection Error: " + error.toString());
     });
@@ -27,12 +28,13 @@ client.on('connect', function(connection) {
         if (connection.connected) {
             connection.sendUTF(JSON.stringify({
                 userId: 1,
-                facultyId: 6
+                facultyIds: [6, 9]
             }));
+
             setTimeout(sendToken, 1000);
         }
     }
-
+    sendToken()
 });
 
 
