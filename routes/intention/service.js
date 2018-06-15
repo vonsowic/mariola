@@ -1,5 +1,5 @@
 const db = require('database');
-const {NotFound} = require('utils/errors')
+const {NotFound} = require('utils/errors');
 
 
 const findAllIntentionsByFacultyId = facultyId =>
@@ -26,7 +26,8 @@ const buildSelectRequest = where => `
         JOIN users u_from ON ei."userFrom"=u_from.id 
         JOIN courses c_what ON c_what.id=ei."whatId" 
         JOIN courses c_for ON c_for.id=ei."forId" 
-        WHERE ${where} ;`;
+        WHERE ${where}
+        ORDER BY ei."createdAt" DESC;`;
 
 const create = (forId, userFrom) =>
     db.ExchangeIntention

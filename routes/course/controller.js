@@ -22,6 +22,12 @@ router.get('/:facultyId/my/general', ensureFacultyMember(), (req, res)=>{
         .then(items => res.send(items))
 });
 
+router.get('/my/ids', (req, res, next) => {
+    service.findCoursesIdsByUserId(req.user.id)
+        .then(ids => res.send(ids))
+
+});
+
 
 router.get('/:facultyId', ensureFacultyMember(), (req, res) => {
     service.findAllByFaculty(

@@ -42,11 +42,25 @@ const findWithNumberOfDetailsAndStudents = facultyId=> db.connection.query(`
     WHERE c."facultyId"=${facultyId};`);
 
 
+const findCoursesIdsByUserId = userId =>
+    db.Course.findAll({
+        attributes: ['id'],
+        include: [{
+            model: db.User,
+            attributes: [],
+            where: {
+                id: userId
+            }
+        }]
+    })
+        .map(({id}) => id);
+
+
 const findAll=(where={}, include=[]) =>
     db.Course.findAll({
         attributes: ['id', 'name', 'group', 'other'],
         include,
-        where: where,
+        where,
         raw: true
     });
 
@@ -77,6 +91,7 @@ const withDetails= interval =>({
 });
 
 module.exports={
+    findCoursesIdsByUserId,
     findWithNumberOfDetailsAndStudents,
     findAll,
     findAllByFaculty,
