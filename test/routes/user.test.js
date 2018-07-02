@@ -1,40 +1,33 @@
 const app = require('../../app');
 const chai= require('chai');
 const chaiHttp = require('chai-http');
-const jwt = require('passport-mariola/jwt');
+
+const {
+    createUser
+} = require('../dbhelper');
 
 chai.use(chaiHttp);
-const request = chai.request;
-const expect = chai.expect;
-const assert = chai.assert;
+const {
+    assert,
+    request
+} = chai;
 
-describe('User test', function () {
-    describe('GET /api/user/me', function () {
-        let user = {
-            id: 0,
-            name: "Jaś",
-            lastName: "Fasola",
-        };
-
-        let token = jwt(user);
-
-        it('Should return Jaś Fasola user', function () {
-            request(app)
-                .get('/api/users/me')
-                .set('Authorization', 'Bearer ' + token)
-                .end((err, res) => {
-                    expect(res).to.have.status(200);
-                    assert.equal(user.name, res.body.name, "Expected name to be Jaś, not " + res.body.name)
-                })
+describe('User test', () => {
+    describe('GET /api/user/me', () => {
+        beforeEach(async () => {
+            await createUser(null, "Jaś", "Fasola")
         });
 
-        it('Should return status 401 without user info', function () {
-            request(app)
-                .get('/api/users/me')
-                .end((err, res) => {
-                    expect(res).to.have.status(401);
-                    assert.equal(Object.keys(res.body), 0, "response should be empty")
-                })
-        })
-    })
+        describe('', () => {
+            it('Should return Jaś Fasola user', () => {
+                request(app)
+                    .get('/api/users/me')
+                    .end((err, res) => {
+                        assert.equal(res.status, 200);
+                        assert.equal(res.body.name, "Jaś", "Expected name to be Jaś, not " + res.body.name);
+                        assert.equal(res.body.lastName, "Fasola", "Expected last name to be Fasola, not " + res.body.lastName)
+                    })
+            });
+        });
+    });
 });
