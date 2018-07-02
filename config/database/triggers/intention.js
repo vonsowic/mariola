@@ -1,16 +1,20 @@
-const err = require('utils/errors');
 const Op = require('sequelize').Op;
+const {
+    NotFound,
+    BadRequest,
+    Conflict
+} = require('utils/errors');
 
 const ensureIntentionIsOk = db => async intention => {
     const forCourse = await db.Course
         .findById(intention.forId);
 
     if(!forCourse){
-        throw new err.NotFound()
+        throw new NotFound()
     }
 
     if(forCourse.group === '0'){
-        throw new err.BadRequest("You can go on lectures whenever you want ;)")
+        throw new BadRequest("You can go on lectures whenever you want ;)")
     }
 
     const whatCourse = await db.Course
@@ -36,7 +40,7 @@ const ensureIntentionIsOk = db => async intention => {
 
 
     if(!whatCourse){
-        throw new err.BadRequest("Is it possible what you are trying to do?")
+        throw new BadRequest("Is it possible what you are trying to do?")
     }
 
     intention.whatId = whatCourse.id;
@@ -48,7 +52,7 @@ const ensureIntentionIsOk = db => async intention => {
                 forId: intention.forId,
             }
     })) {
-        throw new err.Conflict("Intention already exist")
+        throw new Conflict("Intention already exist")
     }
 };
 
@@ -76,7 +80,7 @@ const exchangeIfMatched = db => intention => {
 
 const ensureExchangeIsOk = () => exchange => {
     if(exchange.userFrom === exchange.userTo){
-        throw new err.BadRequest("You can't exchange with yourself")
+        throw new BadRequest("You can't exchange with yourself")
     }
 };
 
