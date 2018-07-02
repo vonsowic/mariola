@@ -1,6 +1,3 @@
-const app = require('../../app');
-const chai= require('chai');
-const chaiHttp = require('chai-http');
 const db = require('database');
 const {
     createUser,
@@ -10,9 +7,9 @@ const {
     createFaculty
 } = require('../dbhelper');
 
-chai.use(chaiHttp);
 
-const {request, assert} = chai;
+const {assert} = require('chai');
+const request = require('../request');
 
 
 describe('Faculty endpoints', () => {
@@ -26,7 +23,7 @@ describe('Faculty endpoints', () => {
     describe('GET /available', () => {
         describe('When no records are available', () => {
             it('Should return empty list', done => {
-                request(app)
+                request()
                     .get('/api/faculties/available')
                     .end((err, res) => {
                         assert.equal(res.status, 200);
@@ -42,7 +39,7 @@ describe('Faculty endpoints', () => {
             });
 
             it('Should return list with one element', done => {
-                request(app)
+                request()
                     .get('/api/faculties/available')
                     .end((err, res) => {
                         assert.equal(res.status, 200);
@@ -63,7 +60,7 @@ describe('Faculty endpoints', () => {
             otherFaculty = await createFaculty("Automatyka", "unnecessary url 2");
         });
 
-        const fetch = (query={}) => request(app)
+        const fetch = (query={}) => request()
             .get('/api/faculties')
             .query(query);
 
@@ -103,7 +100,7 @@ describe('Faculty endpoints', () => {
         beforeEach(async () => {
             faculty = await createAvailableFaculty();
 
-            await request(app)
+            await request()
                 .post('/api/faculties/create')
                 .send({
                     facultyId: faculty.id,
@@ -112,7 +109,7 @@ describe('Faculty endpoints', () => {
         });
 
         it('Should return list with 8 elements', done => {
-            request(app)
+            request()
                 .get(`/api/faculties/${faculty.id}/groups`)
                 .end((err, res) => {
                     assert.equal(res.status, 200);
@@ -132,7 +129,7 @@ describe('Faculty endpoints', () => {
         });
 
         it('Should create new faculty based on available faculty; download faculty courses and make user an admin', done => {
-            request(app)
+            request()
                 .post('/api/faculties/create')
                 .send({
                     facultyId: faculty.id,
@@ -186,7 +183,7 @@ describe('Faculty endpoints', () => {
             });
 
             it('User should not be able to join ', done => {
-                request(app)
+                request()
                     .post('/api/faculties/join')
                     .send({
                         facultyId: faculty.id,
@@ -202,7 +199,7 @@ describe('Faculty endpoints', () => {
 
         describe('When user is not a member of faculty', () => {
             it('User should be able to join, but only once', done => {
-                request(app)
+                request()
                     .post('/api/faculties/join')
                     .send({
                         facultyId: faculty.id,
@@ -216,7 +213,7 @@ describe('Faculty endpoints', () => {
         });
 
         it('User should not be able to join unexisting faculty', done => {
-            request(app)
+            request()
                 .post('/api/faculties/join')
                 .send({
                     facultyId: faculty.id + 1,
@@ -242,7 +239,7 @@ describe('Faculty endpoints', () => {
             });
 
             it('Faculty should be deleted', done => {
-                request(app)
+                request()
                     .delete(`/api/faculties/${faculty.id}`)
                     .end((err, res) => {
                         assert.equal(res.status, 204);
@@ -257,7 +254,7 @@ describe('Faculty endpoints', () => {
             });
 
             it('Faculty should not be deleted', done => {
-                request(app)
+                request()
                     .delete(`/api/faculties/${faculty.id}`)
                     .end((err, res) => {
                         assert.equal(res.status, 403);
@@ -275,7 +272,7 @@ describe('Faculty endpoints', () => {
         });
 
         it('Should leave faculty', done => {
-            request(app)
+            request()
                 .delete(`/api/faculties/${faculty.id}/leave`)
                 .end((err, res) => {
                     assert.equal(res.status, 204);
