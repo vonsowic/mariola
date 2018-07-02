@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const service = require('./service');
-const ensureFacultyMember = require('utils/guards').ensureFacultyMember;
+const { ensureFacultyMember } = require('utils/guards');
+const { NotAllowed } = require('utils/errors');
 
 router.get('/:facultyId', ensureFacultyMember(), (req, res, next) => {
     service.findAllIntentionsByFacultyId(req.params.facultyId)
@@ -10,7 +11,7 @@ router.get('/:facultyId', ensureFacultyMember(), (req, res, next) => {
 
 
 router.get('/:facultyId/:intentionId', ensureFacultyMember(), (req, res, next) => {
-    service.findOneIntentionById(req.params.facultyId, req.params.intentionId)
+    service.findOneIntentionById(req.params.intentionId, req.params.facultyId)
         .then(result => res.send(result))
         .catch(err => next(err))
 });
@@ -22,22 +23,22 @@ router.post('/', (req, res, next) => {
         .catch(err => next(err))
 });
 
-// TODO: all
-router.post('/specific', (req, res, next) => {
-   service.exchange(req.body.intentionId, req.user.id)
-        .then(() => res
-            .status(201)
-            .end())
-        .catch(err => next(err))
-});
 
-// TODO: trigger ensureOwner
-router.delete('/:intentionId', (req, res, next) => {
-    service.remove(req.params.intentionId)
-        .then(() => res
-            .status(204)
-            .end())
-        .catch(err => next(err))
+router.delete('/:intentionId', async (req, res, next) => {
+    try {
+        const ei = await service.findOneIntentionById(req.params.intentionId);
+
+        if( ei.userId !== req.user.id) {
+            throw new NotAllowed()
+        }
+
+        service.remove(req.params.intentionId)
+            .then(() => res
+                .status(204)
+                .end())
+    } catch (err) {
+        next(err)
+    }
 });
 
 

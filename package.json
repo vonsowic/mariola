@@ -3,10 +3,11 @@
   "version": "0.0.0",
   "private": true,
   "main": "app.js",
+  "repository": "https://github.com/vonsowic/mariola",
   "scripts": {
-    "start": "npm run server",
+    "start": "node ./bin/www.js",
     "server": "nodemon ./bin/www.js",
-    "test": "EXPIRATION_TIME_AS_SECONDS=900 CLIENT_ID=0 DATABASE_URL=postgres://localhost:5432/mariolatest RUN_AS=432165447 mocha --timeout 10000 --recursive"
+    "test": "EXPIRATION_TIME_AS_SECONDS=900 CLIENT_ID=0 DATABASE_URL=postgres://localhost:5432/mariolatest RUN_AS=432165447 mocha --timeout 10000 --recursive --exit"
   },
   "dependencies": {
     "axios": "^0.18.0",
@@ -14,7 +15,7 @@
     "database": "file:config/database",
     "debug": "~2.6.9",
     "dotenv": "^5.0.1",
-    "express": "~4.15.5",
+    "express": "^4.16.3",
     "jsonwebtoken": "^8.2.1",
     "morgan": "~1.9.0",
     "notification-service": "file:notification",
@@ -24,6 +25,7 @@
   },
   "devDependencies": {
     "@types/express": "^4.11.1",
+    "@types/sequelize": "^4.27.23",
     "babel-core": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "chai": "^4.1.2",

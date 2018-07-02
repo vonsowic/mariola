@@ -8,13 +8,13 @@ const findAllIntentionsByFacultyId = facultyId =>
         { include: [{ model: db.Course }] })
         .then(res => res[0]);
 
-const findOneIntentionById = (facultyId, intentionId) =>
+const findOneIntentionById = (intentionId, facultyId) =>
     db.connection.query(
-        buildSelectRequest(`ei.id=${intentionId} AND c_what."facultyId"=${facultyId}`),
+        buildSelectRequest(`ei.id=${intentionId} ${facultyId ? `AND c_what."facultyId"=${facultyId}` : ''}`),
         { include: [{ model: db.Course }] })
         .then(res => res[0][0] || (() => {throw new NotFound('Intention does not exist')})());
 
-const buildSelectRequest = where => `
+const buildSelectRequest = (where="'t'") => `
         SELECT  
             ei.id, 
             c_what.name AS "course",

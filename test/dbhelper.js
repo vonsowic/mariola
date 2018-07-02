@@ -1,9 +1,9 @@
 const db = require('database');
 
 
-const initializeDatabase = () => db.connection.sync({
-    force: true
-});
+const initializeDatabase = () => db
+    .connection
+    .sync({force: true});
 
 const createAvailableFaculty = (name, url) =>
     db.AvailableFaculty.create({
@@ -20,8 +20,7 @@ const createFaculty = (name, url) =>
             name
         }));
 
-let x = 0;
-const createUser = (fbProfileId=process.env.RUN_AS, name='name' + x, lastName='lastName'+x) =>
+const createUser = (fbProfileId=process.env.RUN_AS, name='name', lastName='lastName') =>
     db.User.create({
         name,
         lastName,
@@ -36,51 +35,18 @@ const addUserToFaculty = (userId, facultyId, isAdmin=false) =>
             isAdmin
         });
 
-const createCourse = (facultyId, group='1', name='Lightsaber basics', frequency=14) =>
-    db.Course.create({
-        facultyId,
-        group,
-        name,
-        lecturer: 'Obi-Wan Kenobi',
-        place: 'Millenium Falcon'
-    }).then(async course => {
-        let now = new Date;
-        let details = Array(frequency)
-            .fill(0)
-            .map(() => {
-                now.setDate(now.getDate() + 7);
-                let end = new Date(now.getTime());
-                end.setMinutes(now.getMinutes() + 90);
-                return {
-                    start: now,
-                    end,
-                    courseId: course.id
-                }
-            });
+const createCourse = (facultyId, name='course name', group='1') => db.Course
+        .create({
+            facultyId,
+            group,
+            name
+        });
 
-        await db
-            .CourseDetail
-            .bulkCreate(details)
-
-        return course
+const assignCourse = (userId, courseId) => db.UserCourse
+    .create({
+        userId,
+        courseId
     });
-
-
-const userCourse = (userId, courseId) =>
-    db.UserCourse
-        .create({
-            userId,
-            courseId
-        });
-
-const createIntention = (whatId, forId, userFrom) =>
-    db.ExchangeIntention
-        .create({
-            whatId,
-            forId,
-            userFrom
-        });
-
 
 module.exports={
     initializeDatabase,
@@ -89,6 +55,5 @@ module.exports={
     createUser,
     addUserToFaculty,
     createCourse,
-    userCourse,
-    createIntention
+    assignCourse
 };

@@ -1,96 +1,199 @@
-const app = require('../../app');
-const chai= require('chai');
-const chaiHttp = require('chai-http');
-const jwt = require('passport-mariola/jwt');
+const {
+    createUser,
+    initializeDatabase,
+    addUserToFaculty,
+    createFaculty,
+    createCourse,
+    assignCourse
+} = require('../dbhelper');
 
-chai.use(chaiHttp);
-const request = chai.request;
-const assert = chai.assert;
+const {ExchangeIntention} = require('database');
+const request = require('../request');
+const {assert} = require('chai');
 
-const dbhelper = require('../dbhelper');
+describe('Faculty endpoints', () => {
 
-describe('Intention and exchanges test', function () {
+    let tester, otherUser,
+        faculty, otherFaculty,
+        c1g0, c1g1, c1g2, c2g1, c2g2,
+        f2c1g1;
 
-    let db;
-    let tester;
-    let token;
-    let user;
-    let faculty;
-    let forCourse;
-    let whatCourse;
+    beforeEach(async () => {
+        await initializeDatabase();
+        tester = await createUser();
+        otherUser = await createUser('123');
 
-    const init = async() => {
-        db = await dbhelper.initializeDatabase();
-        faculty= await dbhelper.createFaculty('Informatyka');
+        faculty = await createFaculty();
+        await addUserToFaculty(tester.id, faculty.id);
 
-        tester = await dbhelper.createUserInFaculty(faculty.id, 'name', 'lasnname', 1);
-        token = jwt(tester);
-        user = await dbhelper.createUserInFaculty(faculty.id);
+        otherFaculty = await createFaculty('Automatyka', 'dummy url');
+        await addUserToFaculty(otherUser.id, faculty.id);
 
-        forCourse = await dbhelper.createCourse(faculty.id);
-        whatCourse = await dbhelper.createCourse(faculty.id);
+        c1g0 = await createCourse(faculty.id, 'Study of Ancient Runes', '0');
+        c1g1 = await createCourse(faculty.id, 'Study of Ancient Runes', '1a');
+        c1g2 = await createCourse(faculty.id, 'Study of Ancient Runes', '1b');
+        c2g1 = await createCourse(faculty.id, 'Alchemy', '1a');
+        c2g2 = await createCourse(faculty.id, 'Alchemy', '1b');
 
-        await dbhelper.userCourse(tester.id, whatCourse.id);
-        await dbhelper.userCourse(user.id, forCourse.id);
-    };
+        f2c1g1 = await createCourse(otherFaculty.id, 'Alchemy', '1a');
 
-    beforeEach('Prepare test data', function (done) {
-        init().then(done)
+        assignCourse(tester.id, c1g1.id);
+        assignCourse(tester.id, c2g1.id);
+
+        assignCourse(otherUser.id, c1g2.id);
+        assignCourse(otherUser.id, c2g2.id);
     });
 
+    describe('GET /:facultyId', () => {
+        beforeEach(async () => {
+            await ExchangeIntention
+                .create({
+                    whatId: c1g1.id,
+                    forId: c1g2.id,
+                    userFrom: tester.id,
+                })
+        });
 
-    describe('GET /api/exchanges', function () {
-        it('Should return empty list', function () {
-            request(app)
-                .get(`/api/exchanges/${faculty.id}`)
-                .set('Authorization', 'Bearer ' + token)
+        it('Should return list with one exchange intention', done => {
+            request()
+                .get(`/api/intentions/${faculty.id}`)
                 .end((err, res) => {
-                    assert.equal(200, res.status);
-                    assert.equal(0, res.body.length, "Expected empty list")
+                    assert.equal(res.body.length, 1, 'There should be only one intention');
+                    done()
                 })
         });
     });
 
-    describe('POST /api/exchanges', function () {
-        it('Should create new intention', function () {
-            request(app)
-                .post('/api/exchanges')
-                .set('Authorization', 'Bearer ' + token)
-                .send({
-                    forId: forCourse.id
-                })
-                .end((err, res) => {
-                    assert.equal(200, res.status);
+    describe('GET /:facultyId/:intentionId', () => {
+        let intention;
+        beforeEach(async () => {
+            intention = await ExchangeIntention
+                .create({
+                    whatId: c1g1.id,
+                    forId: c1g2.id,
+                    userFrom: tester.id,
                 })
         });
 
-        it('Should not create second identical intention', async function () {
-            await dbhelper.createIntention(whatCourse.id, forCourse.id, tester.id);
-
-            request(app)
-                .post('/api/exchanges')
-                .set('Authorization', 'Bearer ' + token)
-                .send({
-                    forId: forCourse.id
-                })
+        it('Should return list with one exchange intention', done => {
+            request()
+                .get(`/api/intentions/${faculty.id}/${intention.id}`)
                 .end((err, res) => {
-                    assert.equal(409, res.status, "User should not be able to create identical intention");
+                    assert.equal(res.body.id, intention.id);
+                    done()
+                })
+        });
+    });
+
+    describe('POST /:facultyId', () => {
+        const fetch = forId => request()
+            .post('/api/intentions')
+            .send({forId});
+
+        it('Should create new intention', done => {
+            fetch(c1g2.id)
+                .end((err, res) => {
+                    assert.equal(res.status, 200);
+                    done()
                 })
         });
 
-        it('Should not be allowed to create intention in faculty that he is not a member of', async function () {
-            let anotherFaculty = await dbhelper.createFaculty('Informatyka Wiet');
-            let anotherCourse = await dbhelper.createCourse(anotherFaculty.id);
+        describe('When user has already declared this intention', () => {
+            beforeEach(async () => {
+                await ExchangeIntention
+                    .create({
+                        forId: c1g2.id,
+                        userFrom: tester.id
+                    })
+            });
 
-            request(app)
-                .post('/api/exchanges')
-                .set('Authorization', 'Bearer ' + token)
-                .send({
-                    forId: anotherCourse.id
-                })
-                .end((err, res) => {
-                    assert.equal(403, res.status);
-                })
+            it('Intention should not be created', done => {
+                fetch(c1g2.id)
+                    .end((err, res) => {
+                        assert.equal(res.status, 409);
+                        done()
+                    })
+            })
         });
+
+        describe('When user is not member of this faculty', () => {
+            it('Intention should not be created', done => {
+                fetch(f2c1g1.id)
+                    .end((err, res) => {
+                        assert.equal(res.status, 400);
+                        done()
+                    })
+            })
+        });
+
+        describe('When course does not exist', () => {
+            it('Intention should not be created', done => {
+                fetch(0)
+                    .end((err, res) => {
+                        assert.equal(res.status, 404);
+                        done()
+                    })
+            })
+        });
+
+        describe('When course is lecture', () => {
+            it('Intention should not be created', done => {
+                fetch(c1g0.id)
+                    .end((err, res) => {
+                        assert.equal(res.status, 400);
+                        done()
+                    })
+            })
+        })
+    });
+
+    describe('DELETE /:intentionId', () => {
+        describe('When user is creator of intention', () => {
+            let intention;
+            beforeEach(async () => {
+                intention = await ExchangeIntention
+                    .create({
+                        whatId: c1g1.id,
+                        forId: c1g2.id,
+                        userFrom: tester.id,
+                    })
+            });
+
+            it('Exchange intention should be removed', done => {
+                request()
+                    .delete(`/api/intentions/${intention.id}`)
+                    .end((err, res) => {
+                        assert.equal(res.status, 204);
+
+                        ExchangeIntention
+                            .findById(intention.id)
+                            .then(ei => {
+                                assert(ei === null, 'Exchange intention should be removed');
+                                done()
+                            })
+                    })
+            })
+        });
+
+        describe('When user is not creator of intention', () => {
+            let intention;
+            beforeEach(async () => {
+                intention = await ExchangeIntention
+                    .create({
+                        whatId: c1g2.id,
+                        forId: c1g1.id,
+                        userFrom: otherUser.id,
+                    })
+            });
+
+            it('Exchange intention should be removed', done => {
+                request()
+                    .delete(`/api/intentions/${intention.id}`)
+                    .end((err, res) => {
+                        assert.equal(res.status, 403);
+                        done()
+                    })
+            })
+        })
     })
 });

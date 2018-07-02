@@ -5,8 +5,17 @@ const ensureIntentionIsOk = db => async intention => {
     const forCourse = await db.Course
         .findById(intention.forId);
 
+    if(!forCourse){
+        throw new err.NotFound()
+    }
+
+    if(forCourse.group === '0'){
+        throw new err.BadRequest("You can go on lectures whenever you want ;)")
+    }
+
     const whatCourse = await db.Course
         .findOne({
+            required: true,
             where: {
                 name: forCourse.name,
                 facultyId: forCourse.facultyId,
@@ -17,17 +26,17 @@ const ensureIntentionIsOk = db => async intention => {
                     [Op.ne]: forCourse.id
                 }
             },
-            through: {
-                model: db.UserCourse,
+            include: [{
+                model: db.User,
                 where: {
-                    userId: intention.userFrom
+                    id: intention.userFrom
                 }
-            }
+            }]
         });
 
 
-    if(!whatCourse || !forCourse){
-        throw new err.BadRequest()
+    if(!whatCourse){
+        throw new err.BadRequest("Is it possible what you are trying to do?")
     }
 
     intention.whatId = whatCourse.id;
@@ -53,7 +62,7 @@ const exchangeIfMatched = db => intention => {
             order: ['createdAt'],
         })
         .then(matchedIntention => {
-            if(matchedIntention){
+            if(matchedIntention) {
                 db.Exchanged
                     .create({
                         whatId: matchedIntention.whatId,
@@ -91,10 +100,10 @@ const exchangeCourses = db => exchange => {
     })
 };
 
-const removeIntentionAfterExchanged = (db, op) => (exchanged) => {
+const removeIntentionAfterExchanged = (db, Op) => (exchanged) => {
     db.ExchangeIntention.destroy({
         where: {
-            [op.or]: [{
+            [Op.or]: [{
                 userFrom: exchanged.userFrom,
                 whatId: exchanged.whatId,
                 forId: exchanged.forId

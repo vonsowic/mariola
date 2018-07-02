@@ -6,20 +6,19 @@ const courseDetail = require('./models/course-detail');
 const faculty = require('./models/faculty');
 const availableFaculty = require('./models/available-faculties');
 const course = require('./models/course');
-const triggers = require('./triggers/intention');
+const intentionTriggers = require('./triggers/intention');
 const courseTriggers = require('./triggers/course');
+const userFacultyTriggers = require('./triggers/user-faculty');
 
 const db = new Sequelize(
     process.env.DATABASE_URL,
-    Object.assign({
-        logging: process.env.DATABASE_LOGGING === 'true' ? console.log : false
-    }, (process.env.DATABASE_URL.includes('postgres'))
-        ? {timezone: 'Europe/Warsaw'} // POSTGRES
-        : {})                           // OTHER DB
+    Object.assign(
+        { logging: process.env.DATABASE_LOGGING === 'true' ? console.log : false },
+        { timezone: 'Europe/Warsaw' })
 );
 
 
-
+// TABLES
 const User = db.define('users', user);
 const ExchangeIntention = db.define('exchange_intentions', {});
 const Faculty = db.define('faculties', faculty);
@@ -30,6 +29,8 @@ const CourseDetail = db.define('courses_details', courseDetail);
 const Exchanged = db.define('exchanges', {});
 const UserFaculty = db.define('user_faculty', userFaculty);
 
+
+// RELATIONS
 User.belongsToMany(Faculty, {through: UserFaculty});
 Faculty.belongsToMany(User, {through: UserFaculty});
 
@@ -49,7 +50,11 @@ User.hasMany(ExchangeIntention, {foreignKey: 'userFrom', onDelete: 'CASCADE'});
 User.hasMany(Exchanged, {foreignKey: 'userFrom', onDelete: 'CASCADE'});
 User.hasMany(Exchanged, {foreignKey: 'userTo', onDelete: 'CASCADE'});
 
-const models = {
+
+module.exports = {
+    Op: Sequelize.Op,
+    connection: db,
+    sequelize : Sequelize,
     User,
     ExchangeIntention,
     Faculty,
@@ -61,18 +66,15 @@ const models = {
     UserCourse,
 };
 
-ExchangeIntention.beforeValidate(triggers.ensureIntentionIsOk(models));
-ExchangeIntention.beforeCreate(triggers.exchangeIfMatched(models));
 
-Exchanged.beforeValidate(triggers.ensureExchangeIsOk());
-Exchanged.afterCreate(triggers.removeIntentionAfterExchanged(models, Sequelize.Op));
-Exchanged.afterCreate(triggers.exchangeCourses(models));
+// TRIGGERS
+ExchangeIntention.beforeValidate(intentionTriggers.ensureIntentionIsOk(module.exports));
+ExchangeIntention.beforeCreate(intentionTriggers.exchangeIfMatched(module.exports));
+
+Exchanged.beforeValidate(intentionTriggers.ensureExchangeIsOk());
+Exchanged.afterCreate(intentionTriggers.removeIntentionAfterExchanged(module.exports, Sequelize.Op));
+Exchanged.afterCreate(intentionTriggers.exchangeCourses(module.exports));
 
 Course.beforeValidate(courseTriggers.insertDefaultMaxStudentsNumber);
 
-module.exports = Object.assign(
-    models, {
-    Op: Sequelize.Op,
-    connection: db,
-    sequelize : Sequelize
-});
+UserFaculty.afterDestroy(userFacultyTriggers.removeUsersDataAfterLeaving(db));
