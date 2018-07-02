@@ -45,22 +45,18 @@ describe('Faculty endpoints', () => {
     });
 
     describe('GET /:facultyId', () => {
-        beforeEach(async () => {
+        it('Should return list with one exchange intention', async () => {
             await ExchangeIntention
                 .create({
                     whatId: c1g1.id,
                     forId: c1g2.id,
                     userFrom: tester.id,
-                })
-        });
+                });
 
-        it('Should return list with one exchange intention', done => {
-            request()
+            const res = await request()
                 .get(`/api/intentions/${faculty.id}`)
-                .end((err, res) => {
-                    assert.equal(res.body.length, 1, 'There should be only one intention');
-                    done()
-                })
+
+            assert.equal(res.body.length, 1, 'There should be only one intention');
         });
     });
 
@@ -99,20 +95,15 @@ describe('Faculty endpoints', () => {
         });
 
         describe('When user has already declared this intention', () => {
-            beforeEach(async () => {
+            it('Intention should not be created', async () => {
                 await ExchangeIntention
                     .create({
                         forId: c1g2.id,
                         userFrom: tester.id
-                    })
-            });
+                    });
 
-            it('Intention should not be created', done => {
-                fetch(c1g2.id)
-                    .end((err, res) => {
-                        assert.equal(res.status, 409);
-                        done()
-                    })
+                const res = await fetch(c1g2.id);
+                assert.equal(res.status, 409);
             })
         });
 
@@ -176,23 +167,18 @@ describe('Faculty endpoints', () => {
         });
 
         describe('When user is not creator of intention', () => {
-            let intention;
-            beforeEach(async () => {
-                intention = await ExchangeIntention
+            it('Exchange intention should be removed', async () => {
+                const intention = await ExchangeIntention
                     .create({
                         whatId: c1g2.id,
                         forId: c1g1.id,
                         userFrom: otherUser.id,
-                    })
-            });
+                    });
 
-            it('Exchange intention should be removed', done => {
-                request()
+                const res = await request()
                     .delete(`/api/intentions/${intention.id}`)
-                    .end((err, res) => {
-                        assert.equal(res.status, 403);
-                        done()
-                    })
+
+                assert.equal(res.status, 403);
             })
         })
     })
