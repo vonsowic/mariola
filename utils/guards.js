@@ -18,7 +18,9 @@ const ensureFacultyMember = (idGetter=defaultIdGetter) => (req, res, next) => {
     if(idGetter(req) in req.user.faculties){
         next()
     } else {
-        res.send(403, {message: 'You are not member of faculty!'})
+        res
+            .status(403)
+            .send({message: 'You are not member of faculty!'})
     }
 };
 
@@ -29,7 +31,9 @@ const ensureIsAdmin = (idGetter=defaultIdGetter) => (req, res, next) => {
     if(req.user.faculties[idGetter(req)]){
         next()
     } else {
-        res.send(403, {message: 'You are the root!'})
+        res
+            .status(403)
+            .send({message: 'You are the root!'})
     }
 };
 
