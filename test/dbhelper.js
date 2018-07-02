@@ -1,38 +1,40 @@
 const db = require('database');
 
 
-const initializeDatabase = async () => {
-    await db.connection.sync({force: true});
-    return db
-};
+const initializeDatabase = () => db.connection.sync({
+    force: true
+});
 
-
-const createFaculty = name =>
+const createAvailableFaculty = (name, url) =>
     db.AvailableFaculty.create({
         name,
         semester: 0,
-        url: 'http://student.agh.edu.pl/~miwas/plan-mocks.json'
-    }).then(af => db.Faculty
+        url: url || 'http://student.agh.edu.pl/~miwas/plan-mocks.json'
+    });
+
+const createFaculty = (name, url) =>
+    createAvailableFaculty(name, url)
+        .then(af => db.Faculty
         .create({
             availableFacultyId: af.id,
             name
         }));
 
 let x = 0;
-const createUserInFaculty = (facultyId, name='name' + x, lastName='lastName'+x, fbProfileId=String(x++)) =>
+const createUser = (fbProfileId=process.env.RUN_AS, name='name' + x, lastName='lastName'+x) =>
     db.User.create({
         name,
         lastName,
         fbProfileId
-    }).then(async user => {
-        await db.UserFaculty
-            .create({
-                userId: user.id,
-                facultyId
-            });
-
-        return user
     });
+
+const addUserToFaculty = (userId, facultyId, isAdmin=false) =>
+    db.UserFaculty
+        .create({
+            userId,
+            facultyId,
+            isAdmin
+        });
 
 const createCourse = (facultyId, group='1', name='Lightsaber basics', frequency=14) =>
     db.Course.create({
@@ -82,8 +84,10 @@ const createIntention = (whatId, forId, userFrom) =>
 
 module.exports={
     initializeDatabase,
+    createAvailableFaculty,
     createFaculty,
-    createUserInFaculty,
+    createUser,
+    addUserToFaculty,
     createCourse,
     userCourse,
     createIntention
