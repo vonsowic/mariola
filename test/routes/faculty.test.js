@@ -263,21 +263,4 @@ describe('Faculty endpoints', () => {
             });
         });
     });
-
-    describe('DELETE /:facultyId/leave', () => {
-        let faculty;
-        beforeEach(async () => {
-            faculty = await createFaculty();
-            await addUserToFaculty(tester.id, faculty.id)
-        });
-
-        it('Should leave faculty', done => {
-            request()
-                .delete(`/api/faculties/${faculty.id}/leave`)
-                .end((err, res) => {
-                    assert.equal(res.status, 204);
-                    done()
-                })
-        });
-    });
 });

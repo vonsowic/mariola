@@ -91,22 +91,6 @@ router.get('/:facultyId/admin', (req, res) => {
         .then(admin => res.send(admin));
 });
 
-router.delete('/:facultyId/leave', ensureFacultyMember(), (req, res, next) => {
-    db.UserFaculty
-        .destroy({
-            where: {
-                userId: req.user.id,
-                facultyId: req.params.facultyId
-            }
-        })
-        .then(() => {
-            unauthenticate(req.user);
-            res
-                .status(204)
-                .end()
-        })
-});
-
 router.get('/:facultyId/groups', (req, res) => {
     db.Course.findAll({
         where: {facultyId: req.params.facultyId},
