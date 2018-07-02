@@ -35,18 +35,28 @@ const addUserToFaculty = (userId, facultyId, isAdmin=false) =>
             isAdmin
         });
 
-const createCourse = (facultyId, name='course name', group='1') => db.Course
+const createCourse = (facultyId, name='course name', group='1') =>
+    db.Course
         .create({
             facultyId,
             group,
             name
         });
 
-const assignCourse = (userId, courseId) => db.UserCourse
-    .create({
-        userId,
-        courseId
-    });
+const assignCourse = (userId, courseId) =>
+    db.UserCourse
+        .create({
+            userId,
+            courseId
+        });
+
+const createIntention = (userFrom, forId) =>
+    db.ExchangeIntention
+        .create({
+            userFrom,
+            forId
+        });
+
 
 module.exports={
     initializeDatabase,
@@ -55,5 +65,6 @@ module.exports={
     createUser,
     addUserToFaculty,
     createCourse,
-    assignCourse
+    assignCourse,
+    createIntention
 };

@@ -8,7 +8,7 @@ const {
     createIntention
 } = require('../dbhelper');
 
-const {Course, UserCourse} = require('database');
+const {Exchanged} = require('database');
 const request = require('../request');
 const {assert} = require('chai');
 
@@ -55,8 +55,39 @@ describe('Exchanges tests', () => {
         await assignCourse(user2, c2g2);
     });
 
-    it('', async () => {
+    it('User1 and tester should exchange their Study of Ancient Runes course', async () => {
         await createIntention(user1, c1g1);
-        assert(true)
-    })
+        await createIntention(user2, c1g1);
+        await createIntention(testerId, c1g2);
+
+        const e = await Exchanged.findOne();
+        assert.equal(e.userFrom, user1);
+        assert.equal(e.userTo, testerId);
+        assert.equal(e.whatId, c1g2);
+        assert.equal(e.forId, c1g1)
+    });
+
+    it('No exchages', async () => {
+        await createIntention(user1, c1g1);
+        await createIntention(user2, c1g1);
+        await createIntention(testerId, c2g2);
+
+        const {count} = await Exchanged.findAndCountAll();
+        assert.equal(count, 0, `There should be no exchages, not ${count}`)
+    });
+
+    it('User2 and tester should exchange their Alchemy course', async () => {
+        await createIntention(user1, c1g1);
+        await createIntention(user2, c1g1);
+        await createIntention(user2, c2g1);
+        await createIntention(testerId, c2g2);
+
+        const e = await Exchanged.findOne();
+        const {count} = await Exchanged.findAndCountAll();
+        assert.equal(e.userFrom, user2);
+        assert.equal(e.userTo, testerId);
+        assert.equal(e.whatId, c2g2);
+        assert.equal(e.forId, c2g1);
+        assert.equal(count, 1)
+    });
 });
