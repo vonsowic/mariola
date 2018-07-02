@@ -6,19 +6,16 @@
   "scripts": {
     "start": "npm run server",
     "server": "nodemon ./bin/www.js",
-    "test": "EXPIRATION_TIME_AS_SECONDS=900 CLIENT_ID=0 DATABASE_URL=postgres://localhost:5432/mariolatest RUN_AS=432165447 mocha test/routes/faculty.test.js --timeout 5000 --recursive"
+    "test": "EXPIRATION_TIME_AS_SECONDS=900 CLIENT_ID=0 DATABASE_URL=postgres://localhost:5432/mariolatest RUN_AS=432165447 mocha --timeout 10000 --recursive"
   },
   "dependencies": {
     "axios": "^0.18.0",
     "body-parser": "~1.18.2",
-    "concurrently": "^3.5.1",
     "database": "file:config/database",
     "debug": "~2.6.9",
     "dotenv": "^5.0.1",
     "express": "~4.15.5",
-    "immutable": "^3.8.2",
     "jsonwebtoken": "^8.2.1",
-    "knex": "^0.14.6",
     "morgan": "~1.9.0",
     "notification-service": "file:notification",
     "passport-custom": "^1.0.5",
@@ -32,7 +29,6 @@
     "chai": "^4.1.2",
     "chai-http": "^4.0.0",
     "mocha": "^5.0.5",
-    "nodemon": "^1.17.2",
-    "sqlite3": "^4.0.0"
+    "nodemon": "^1.17.2"
   }
 }
