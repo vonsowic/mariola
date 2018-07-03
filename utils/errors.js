@@ -29,9 +29,16 @@ class NotAllowed extends RequestError {
     }
 }
 
+class Locked extends RequestError {
+    constructor(message='Currently not available') {
+        super(423, message)
+    }
+}
+
 module.exports={
     BadRequest,
     NotAllowed,
     Conflict,
-    NotFound
+    NotFound,
+    Locked
 };
