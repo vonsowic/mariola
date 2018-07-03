@@ -6,10 +6,9 @@ const {
     createCourse,
     assignCourse,
     createIntention
-} = require('../dbhelper');
+} = require('./dbhelper');
 
 const {Exchanged} = require('database');
-const request = require('../request');
 const {assert} = require('chai');
 
 describe('Exchanges tests', () => {

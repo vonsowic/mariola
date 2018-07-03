@@ -78,52 +78,41 @@ const exchangeIfMatched = db => intention => {
         })
 };
 
-const ensureExchangeIsOk = () => exchange => {
-    if(exchange.userFrom === exchange.userTo){
-        throw new BadRequest("You can't exchange with yourself")
-    }
+const transferWithoutExchangeIfPossible = db => async intention => {
+    Promise
+        .all([
+            isTransferWithoutExchangeEnabled(db, intention),
+            isMembersNumberSmallerThanMaximum(db, intention)
+        ])
+        .then(conditions => {
+            if(conditions.every(x=>x)) {
+                transferStudent(db, intention)
+            }
+        })
 };
 
-const exchangeCourses = db => exchange => {
-    db.UserCourse.update({
-        userId: exchange.userTo
-    }, {
-        where: {
-            userId: exchange.userFrom,
-            courseId: exchange.whatId
-        }
-    });
-
-    db.UserCourse.update({
-        userId: exchange.userFrom
-    }, {
-        where: {
-            userId: exchange.userTo,
-            courseId: exchange.forId
-        }
+const isTransferWithoutExchangeEnabled = ({Faculty}, {whatId}) => Faculty
+    .findOne({
+        attributes: ['transferWithoutExchangeEnabled'],
+        include: [{
+            model: db.Course,
+            attributes: ['id'],
+            where: {
+                id: whatId
+            },
+            required: true
+        }]
     })
-};
+    .then(res => res.transferWithoutExchangeEnabled);
 
-const removeIntentionAfterExchanged = (db, Op) => (exchanged) => {
-    db.ExchangeIntention.destroy({
-        where: {
-            [Op.or]: [{
-                userFrom: exchanged.userFrom,
-                whatId: exchanged.whatId,
-                forId: exchanged.forId
-            }, {
-                userFrom: exchanged.userTo,
-                whatId: exchanged.forId,
-                forId: exchanged.whatId,
-            }]
-        }
-    })
-};
+const isMembersNumberSmallerThanMaximum = async (db, {forId}) => false
+
+const transferStudent = ({Exchanged}, intention) => Exchanged
+    .create(intention);
+
 
 module.exports={
     ensureIntentionIsOk,
     exchangeIfMatched,
-    ensureExchangeIsOk,
-    exchangeCourses,
-    removeIntentionAfterExchanged
+    transferWithoutExchangeIfPossible
 };

@@ -2,16 +2,17 @@ const {BadRequest} = require('utils/errors');
 const service = require('./service');
 const Recruiter = require('utils/Recruiter');
 const db = require('database');
-const { ensureIsAdmin, unauthenticate, ensureFacultyMember } = require('utils/guards');
+const { ensureIsAdmin, unauthenticate } = require('utils/guards');
 const { Conflict } = require('utils/errors');
 const router = require('express').Router();
 
 
 
-router.get('/available', (req, res) => {
+router.get('/available', (req, res, next) => {
     db.AvailableFaculty
         .findAll()
         .then(result => res.send(result))
+        .catch(err => next(err))
 });
 
 
@@ -34,12 +35,13 @@ router.post('/create', (req, res, next) => {
 });
 
 
-router.get('/', (req, res) => {
+router.get('/', (req, res, next) => {
     db.connection.query(`
         SELECT id, name
         FROM faculties 
         ${whereSelector(req.query.onlyMy, req.user.id)};`)
         .then(result => res.send(result[0]))
+        .catch(err => next(err))
 });
 
 const whereSelector = (onlyMy, userId) =>
@@ -67,16 +69,7 @@ router.post('/join', (req, res, next) => {
         .catch(() => next(new Conflict("you are already member of this faculty")))
 });
 
-
-router.delete('/:facultyId', ensureIsAdmin(), (req, res) => {
-    db.Faculty.destroy({ where: {id: req.params.facultyId}});
-
-    res
-        .status(204)
-        .end()
-});
-
-router.get('/:facultyId/admin', (req, res) => {
+router.get('/:facultyId/admin', (req, res, next) => {
     db.User
         .findOne({
             attributes: ["name", "lastName"],
@@ -88,17 +81,77 @@ router.get('/:facultyId/admin', (req, res) => {
                 ORDER BY "updatedAt"
                 LIMIT 1)`)
         })
-        .then(admin => res.send(admin));
+        .then(admin => res.send(admin))
+        .catch(err => next(err))
 });
 
-router.get('/:facultyId/groups', (req, res) => {
+router.get('/:facultyId/groups', (req, res, next) => {
     db.Course.findAll({
         where: {facultyId: req.params.facultyId},
         attributes: [[db.sequelize.fn('DISTINCT', db.sequelize.col('group')), 'group']]
     })
         .map(g => g.group)
         .filter(g => g.length === 2)
-        .then(groups => res.send(groups));
+        .then(groups => res.send(groups))
+        .catch(err => next(err))
+});
+
+// ADMIN ENDPOINTS
+router.use(ensureIsAdmin());
+
+router.get('/:facultyId/members', (req, res, next) => {
+    db.User
+        .findAll({
+            attributes: ['id', 'name', 'lastName'],
+            where: {
+                // TODO
+            }
+        })
+        .then(members => res.send(members))
+        .catch(err => next(err))
+});
+
+router.patch('/:facultyId/:userId/ban', (req, res, next) => {
+    db.UserFaculty
+        .update({
+            isBanned: req.body.isBanned
+        }, {
+            userId: req.params.userId,
+            facultyId: req.params.facultyId
+        })
+        .then(result => res.send(result))
+        .catch(err => next(err))
+});
+
+router.patch('/:facultyId/transferWithoutExchange', (req, res, next) => {
+    db.Faculty
+        .update({
+            transferWithoutExchangeEnabled: req.body.transferWithoutExchange
+        }, {
+            id: req.params.facultyId
+        })
+        .then(result => res.send(result))
+        .catch(err => next(err))
+});
+
+router.patch('/:facultyId/:courseName/maxStudentsNumber', (req, res, next) => {
+    db.Course
+        .update({
+            maxStudentsNumber: req.body.maxStudentsNumber
+        }, {
+            facultyId: req.params.facultyId,
+            name: req.params.courseName
+        })
+        .then(result => res.send(result))
+        .catch(err => next(err))
+});
+
+router.delete('/:facultyId', (req, res) => {
+    db.Faculty.destroy({ where: {id: req.params.facultyId}});
+
+    res
+        .status(204)
+        .end()
 });
 
 module.exports = router;
