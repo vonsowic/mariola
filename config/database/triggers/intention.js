@@ -91,7 +91,7 @@ const transferWithoutExchangeIfPossible = db => async intention => {
         })
 };
 
-const isTransferWithoutExchangeEnabled = ({Faculty}, {whatId}) => Faculty
+const isTransferWithoutExchangeEnabled = (db, {whatId}) => db.Faculty
     .findOne({
         attributes: ['transferWithoutExchangeEnabled'],
         include: [{

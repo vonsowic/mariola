@@ -97,9 +97,7 @@ router.get('/:facultyId/groups', (req, res, next) => {
 });
 
 // ADMIN ENDPOINTS
-router.use(ensureIsAdmin());
-
-router.get('/:facultyId/members', (req, res, next) => {
+router.get('/:facultyId/members', ensureIsAdmin(), (req, res, next) => {
     db.User
         .findAll({
             attributes: ['id', 'name', 'lastName'],
@@ -111,7 +109,7 @@ router.get('/:facultyId/members', (req, res, next) => {
         .catch(err => next(err))
 });
 
-router.patch('/:facultyId/:userId/ban', (req, res, next) => {
+router.patch('/:facultyId/:userId/ban', ensureIsAdmin(), (req, res, next) => {
     db.UserFaculty
         .update({
             isBanned: req.body.isBanned
@@ -123,7 +121,7 @@ router.patch('/:facultyId/:userId/ban', (req, res, next) => {
         .catch(err => next(err))
 });
 
-router.patch('/:facultyId/transferWithoutExchange', (req, res, next) => {
+router.patch('/:facultyId/transferWithoutExchange', ensureIsAdmin(), (req, res, next) => {
     db.Faculty
         .update({
             transferWithoutExchangeEnabled: req.body.transferWithoutExchange
@@ -134,7 +132,7 @@ router.patch('/:facultyId/transferWithoutExchange', (req, res, next) => {
         .catch(err => next(err))
 });
 
-router.patch('/:facultyId/:courseName/maxStudentsNumber', (req, res, next) => {
+router.patch('/:facultyId/:courseName/maxStudentsNumber', ensureIsAdmin(), (req, res, next) => {
     db.Course
         .update({
             maxStudentsNumber: req.body.maxStudentsNumber
@@ -146,7 +144,7 @@ router.patch('/:facultyId/:courseName/maxStudentsNumber', (req, res, next) => {
         .catch(err => next(err))
 });
 
-router.delete('/:facultyId', (req, res) => {
+router.delete('/:facultyId', ensureIsAdmin(), (req, res) => {
     db.Faculty.destroy({ where: {id: req.params.facultyId}});
 
     res
