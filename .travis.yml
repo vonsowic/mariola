@@ -2,5 +2,8 @@ language: node_js
 node_js:
   - "9.8.0"
 
-notifications:
-    slack: mariolaworkspace:oM2mWX0Fx3jV0073NIutV3te
+services:
+  - postgresql
+  
+before_script:
+  - psql -c 'create database mariolatest;' -U postgres
