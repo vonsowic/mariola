@@ -1,1 +1,0 @@
-module.exports=(groupId) => (req, res, next)

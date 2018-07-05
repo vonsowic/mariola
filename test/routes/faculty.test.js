@@ -1,8 +1,6 @@
-const db = require('database');
 const {
     createUser,
     initializeDatabase,
-    createAvailableFaculty,
     addUserToFaculty,
     createFaculty
 } = require('../dbhelper');
@@ -18,37 +16,6 @@ describe('Faculty endpoints', () => {
     beforeEach(async () => {
         await initializeDatabase();
         tester = await createUser()
-    });
-
-    describe('GET /available', () => {
-        describe('When no records are available', () => {
-            it('Should return empty list', done => {
-                request()
-                    .get('/api/faculties/available')
-                    .end((err, res) => {
-                        assert.equal(res.status, 200);
-                        assert.equal(res.body.length, 0, "Expected empty list");
-                        done();
-                    })
-            });
-        });
-
-        describe('When one record is available', () => {
-            beforeEach(async () => {
-                await createAvailableFaculty()
-            });
-
-            it('Should return list with one element', done => {
-                request()
-                    .get('/api/faculties/available')
-                    .end((err, res) => {
-                        assert.equal(res.status, 200);
-                        assert.equal(res.body.length, 1, "List with one element");
-                        done()
-                    })
-            });
-        })
-
     });
 
     describe('GET /', () => {
@@ -95,71 +62,17 @@ describe('Faculty endpoints', () => {
     });
 
     describe('GET /:facultyId/groups', () => {
-        let faculty;
+        it('Should return list with 8 elements', async () => {
+            const faculty = await createFaculty();
 
-        beforeEach(async () => {
-            faculty = await createAvailableFaculty();
-
-            await request()
-                .post('/api/faculties/create')
-                .send({
-                    facultyId: faculty.id,
-                    initialGroup: "4b"
-                })
-        });
-
-        it('Should return list with 8 elements', done => {
             request()
                 .get(`/api/faculties/${faculty.id}/groups`)
-                .end((err, res) => {
+                .then((err, res) => {
                     assert.equal(res.status, 200);
                     assert.equal(res.body.length, 8, "Expected list with 8 elements, not " + res.body.length);
-                    done()
                 })
         });
 
-
-    });
-
-    describe('POST /create', () => {
-        let faculty;
-
-        beforeEach(async () => {
-            faculty = await createAvailableFaculty();
-        });
-
-        it('Should create new faculty based on available faculty; download faculty courses and make user an admin', done => {
-            request()
-                .post('/api/faculties/create')
-                .send({
-                    facultyId: faculty.id,
-                    initialGroup: "4b"
-                })
-                .end((err, res) => {
-                    assert.equal(res.status, 200);
-
-                    db.Course
-                        .findAll({
-                            where: {
-                                facultyId: res.body.id
-                            }
-                        })
-                        .then(cs => {
-                            assert.equal(cs.length, 48);
-                        })
-                        .then(() => {
-                            db.UserFaculty
-                                .findOne({
-                                    where: {
-                                        facultyId: res.body.id
-                                    }})
-                                .then(uf => {
-                                    assert(uf.isAdmin, "user should be an admin");
-                                    done()
-                                })
-                        })
-                    })
-        })
 
     });
 

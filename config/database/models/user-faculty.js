@@ -12,7 +12,7 @@ module.exports={
         required: true
     },
     group: {
-        type: Symbol.String(2),
+        type: Symbol.STRING(2),
         required: true
     }
 };

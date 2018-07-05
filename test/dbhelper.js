@@ -5,20 +5,12 @@ const initializeDatabase = () => db
     .connection
     .sync({force: true});
 
-const createAvailableFaculty = (name, url) =>
-    db.AvailableFaculty.create({
-        name,
-        semester: 0,
-        url: url || 'http://student.agh.edu.pl/~miwas/plan-mocks.json'
-    });
-
 const createFaculty = (name, url) =>
-    createAvailableFaculty(name, url)
-        .then(af => db.Faculty
+    db.Faculty
         .create({
-            availableFacultyId: af.id,
-            name
-        }));
+            name,
+            url: url || 'http://student.agh.edu.pl/~miwas/plan-mocks.json'
+        });
 
 const createUser = (fbProfileId=process.env.RUN_AS, name='name', lastName='lastName') =>
     db.User.create({
@@ -60,7 +52,6 @@ const createIntention = (userFrom, forId) =>
 
 module.exports={
     initializeDatabase,
-    createAvailableFaculty,
     createFaculty,
     createUser,
     addUserToFaculty,

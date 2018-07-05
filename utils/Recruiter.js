@@ -19,8 +19,8 @@ class Recruiter {
         return this
     }
 
-    asAdmin(){
-        this.isAdmin = true;
+    asAdmin(value=true){
+        this.isAdmin = value;
         return this
     }
 
