@@ -14,31 +14,33 @@ function download(url){
 function parse(eaiibCourseItems) {
     return eaiibCourseItems
         .data
-        .map(i => {
-            let title = parseTitleField(i.title)
-            return {
-                name: title[0],
-                group: i.group.toString().replace('.1', 'a').replace('.2', 'b'),
-                other: title[1],
-                courseDetails: [{
-                    start: i.start.toLocaleString(),
-                    end: i.end.toLocaleString()
-                }]
-            }
-        })
+        .map(convertFromEAIIBFormat)
         .reduce(
             (plan, item) => {
                 const k = key(item);
-                if(plan.get(k)){
-                    let collectedDetails = plan.get(k).courseDetails;
-                    collectedDetails = collectedDetails.concat(item.courseDetails);
-                    item.courseDetails = collectedDetails
+                if(plan[k]){
+                    let collectedDetails = plan[k].coursesDetails;
+                    collectedDetails = collectedDetails.concat(item.coursesDetails);
+                    item.coursesDetails = collectedDetails
                 }
 
-                return plan.set(k, item)
+                return Object.assign({}, plan, {[k]: item})
             },
-            new Map())
+            {})
 }
+
+const convertFromEAIIBFormat = item => {
+    let title = parseTitleField(item.title);
+    return {
+        name: title[0],
+        group: item.group.toString().replace('.1', 'a').replace('.2', 'b'),
+        other: title[1],
+        coursesDetails: [{
+            start: item.start.toLocaleString(),
+            end: item.end.toLocaleString()
+        }]
+    }
+};
 
 function parseTitleField(it){
     if(it.includes("Informacja")){
@@ -55,4 +57,4 @@ function key(obj){
 }
 
 
-module.exports= url => download(url).then(res => parse(res).values());
+module.exports= url => download(url).then(res => Object.values(parse(res)));

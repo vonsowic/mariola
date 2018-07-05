@@ -11,11 +11,12 @@ if ( !facultyName || !url) {
     const db = require('database');
 
     db.connection.sync({force: false})
-        .then(() => {
-            db.Faculty
-                .create({
-                    name: facultyName,
-                    url
-                })
+        .then(async () => await db.Faculty
+            .create({
+                name: facultyName,
+                url
+            }))
+        .finally(() => {
+            console.log("Wait until course details are saved to database")
         })
 }
