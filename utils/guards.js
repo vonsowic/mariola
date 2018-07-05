@@ -33,7 +33,7 @@ const ensureIsAdmin = (idGetter=defaultIdGetter) => (req, res, next) => {
     } else {
         res
             .status(403)
-            .send({message: 'You are the root!'})
+            .send({message: 'You are not the root!'})
     }
 };
 
