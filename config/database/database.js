@@ -21,7 +21,7 @@ const db = new Sequelize(
 
 // TABLES
 const User = db.define('users', user);
-const ExchangeIntention = db.define('exchange_intentions', {});
+const Intention = db.define('intentions', {});
 const Faculty = db.define('faculties', faculty);
 const Course = db.define('courses', course);
 const UserCourse = db.define('user_course', {});
@@ -38,13 +38,13 @@ User.belongsToMany(Course, {through: UserCourse});
 Course.belongsToMany(User, {through: UserCourse});
 
 Faculty.hasMany(Course, {onDelete: 'CASCADE'});
-Course.hasMany(CourseDetail, {onDelete: 'CASCADE'});
+Course.hasMany(CourseDetail, {foreignKey: 'courseId', onDelete: 'CASCADE'});
 Course.hasMany(Exchanged, {foreignKey: 'whatId', onDelete: 'CASCADE'});
 Course.hasMany(Exchanged, {foreignKey: 'forId', onDelete: 'CASCADE'});
-Course.hasMany(ExchangeIntention, {foreignKey: 'whatId', onDelete: 'CASCADE'});
-Course.hasMany(ExchangeIntention, {foreignKey: 'forId', onDelete: 'CASCADE'});
+Course.hasMany(Intention, {foreignKey: 'whatId', onDelete: 'CASCADE'});
+Course.hasMany(Intention, {foreignKey: 'forId', onDelete: 'CASCADE'});
 
-User.hasMany(ExchangeIntention, {foreignKey: 'userFrom', onDelete: 'CASCADE'});
+User.hasMany(Intention, {foreignKey: 'userFrom', onDelete: 'CASCADE'});
 User.hasMany(Exchanged, {foreignKey: 'userFrom', onDelete: 'CASCADE'});
 User.hasMany(Exchanged, {foreignKey: 'userTo', onDelete: 'CASCADE'});
 
@@ -54,7 +54,7 @@ module.exports = {
     connection: db,
     sequelize: Sequelize,
     User,
-    ExchangeIntention,
+    Intention,
     Faculty,
     Course,
     CourseDetail,
@@ -67,10 +67,10 @@ module.exports = {
 // TRIGGERS
 Faculty.afterCreate(importPlan(module.exports));
 
-ExchangeIntention.beforeValidate(intentionTriggers.checkIfExchangesEnabled(module.exports));
-ExchangeIntention.beforeValidate(intentionTriggers.ensureIntentionIsOk(module.exports));
-ExchangeIntention.beforeCreate(intentionTriggers.exchangeIfMatched(module.exports));
-ExchangeIntention.beforeCreate(intentionTriggers.transferWithoutExchangeIfPossible(module.exports));
+Intention.beforeValidate(intentionTriggers.checkIfExchangesEnabled(module.exports));
+Intention.beforeValidate(intentionTriggers.ensureIntentionIsOk(module.exports));
+Intention.beforeCreate(intentionTriggers.exchangeIfMatched(module.exports));
+Intention.beforeCreate(intentionTriggers.transferWithoutExchangeIfPossible(module.exports));
 
 Exchanged.beforeValidate(exchangeTriggers.ensureExchangeIsOk());
 Exchanged.afterCreate(exchangeTriggers.exchangeCourses(module.exports));

@@ -6,7 +6,7 @@ const removeUsersDataAfterLeaving = db => userFaculty => {
         },
     });
 
-    db.ExchangeIntention.delete({
+    db.Intention.delete({
         where: {
             userFrom: userFaculty.userId,
             whatId: db.connection.literal(`in (SELECT id FROM courses WHERE "facultyId"=${userFaculty.facultyId})`)

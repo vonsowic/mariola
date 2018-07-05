@@ -30,8 +30,8 @@ class DatabaseBridge {
     }
 
     async _initializeTriggers() {
-        await this._createTrigger(channels.INTENTION_CREATED, 'exchange_intentions', 'after insert');
-        await this._createTrigger(channels.INTENTION_REMOVED, 'exchange_intentions', 'after delete');
+        await this._createTrigger(channels.INTENTION_CREATED, 'intentions', 'after insert');
+        await this._createTrigger(channels.INTENTION_REMOVED, 'intentions', 'after delete');
         await this._createTrigger(channels.EXCHANGE_CREATED, 'exchanges', 'after insert');
     }
 

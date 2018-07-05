@@ -7,7 +7,7 @@ const {
     assignCourse
 } = require('../dbhelper');
 
-const {ExchangeIntention} = require('database');
+const {Intention} = require('database');
 const request = require('../request');
 const {assert} = require('chai');
 
@@ -46,7 +46,7 @@ describe('Faculty endpoints', () => {
 
     describe('GET /:facultyId', () => {
         it('Should return list with one exchange intention', async () => {
-            await ExchangeIntention
+            await Intention
                 .create({
                     whatId: c1g1.id,
                     forId: c1g2.id,
@@ -63,7 +63,7 @@ describe('Faculty endpoints', () => {
     describe('GET /:facultyId/:intentionId', () => {
         let intention;
         beforeEach(async () => {
-            intention = await ExchangeIntention
+            intention = await Intention
                 .create({
                     whatId: c1g1.id,
                     forId: c1g2.id,
@@ -96,7 +96,7 @@ describe('Faculty endpoints', () => {
 
         describe('When user has already declared this intention', () => {
             it('Intention should not be created', async () => {
-                await ExchangeIntention
+                await Intention
                     .create({
                         forId: c1g2.id,
                         userFrom: tester.id
@@ -142,7 +142,7 @@ describe('Faculty endpoints', () => {
         describe('When user is creator of intention', () => {
             let intention;
             beforeEach(async () => {
-                intention = await ExchangeIntention
+                intention = await Intention
                     .create({
                         whatId: c1g1.id,
                         forId: c1g2.id,
@@ -156,7 +156,7 @@ describe('Faculty endpoints', () => {
                     .end((err, res) => {
                         assert.equal(res.status, 204);
 
-                        ExchangeIntention
+                        Intention
                             .findById(intention.id)
                             .then(ei => {
                                 assert(ei === null, 'Exchange intention should be removed');
@@ -168,7 +168,7 @@ describe('Faculty endpoints', () => {
 
         describe('When user is not creator of intention', () => {
             it('Exchange intention should be removed', async () => {
-                const intention = await ExchangeIntention
+                const intention = await Intention
                     .create({
                         whatId: c1g2.id,
                         forId: c1g1.id,

@@ -29,7 +29,7 @@ const exchangeCourses = db => exchange => {
 };
 
 const removeIntentionAfterExchanged = (db, Op) => (exchanged) => {
-    db.ExchangeIntention.destroy({
+    db.Intention.destroy({
         where: {
             [Op.or]: [{
                 userFrom: exchanged.userFrom,

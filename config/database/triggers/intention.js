@@ -63,7 +63,7 @@ const ensureIntentionIsOk = db => async intention => {
 
     intention.whatId = whatCourse.id;
 
-    if(await db.ExchangeIntention.findOne({
+    if(await db.Intention.findOne({
             where: {
                 userFrom: intention.userFrom,
                 whatId: intention.whatId,
@@ -75,7 +75,7 @@ const ensureIntentionIsOk = db => async intention => {
 };
 
 const exchangeIfMatched = db => intention => {
-    db.ExchangeIntention
+    db.Intention
         .findOne({
             where: {
                 whatId: intention.forId,

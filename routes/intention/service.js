@@ -22,7 +22,7 @@ const buildSelectRequest = (where="'t'") => `
             c_what.id AS "whatId", c_what.group AS "whatGroup",
             c_for.id AS "forId", c_for.group AS "forGroup",
             ei."createdAt"
-        FROM exchange_intentions ei 
+        FROM intentions ei 
         JOIN users u_from ON ei."userFrom"=u_from.id 
         JOIN courses c_what ON c_what.id=ei."whatId" 
         JOIN courses c_for ON c_for.id=ei."forId" 
@@ -30,14 +30,14 @@ const buildSelectRequest = (where="'t'") => `
         ORDER BY ei."createdAt" DESC;`;
 
 const create = (forId, userFrom) =>
-    db.ExchangeIntention
+    db.Intention
         .create({
             forId,
             userFrom
         });
 
 const exchange = (intentionId, userTo) =>
-    db.ExchangeIntention
+    db.Intention
         .findById(intentionId)
         .then(ex => db.Exchanged
             .create({
@@ -48,7 +48,7 @@ const exchange = (intentionId, userTo) =>
             }));
 
 const remove = intentionId =>
-    db.ExchangeIntention
+    db.Intention
         .destroy({
             where: {id: intentionId}
         });

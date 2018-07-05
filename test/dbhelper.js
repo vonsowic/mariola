@@ -43,7 +43,7 @@ const assignCourse = (userId, courseId) =>
         });
 
 const createIntention = (userFrom, forId) =>
-    db.ExchangeIntention
+    db.Intention
         .create({
             userFrom,
             forId
