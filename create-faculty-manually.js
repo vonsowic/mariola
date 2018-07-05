@@ -10,7 +10,7 @@ if ( !facultyName || !url) {
 
     const db = require('database');
 
-    db.connection.sync({force: true})
+    db.connection.sync({force: false})
         .then(() => {
             db.Faculty
                 .create({
