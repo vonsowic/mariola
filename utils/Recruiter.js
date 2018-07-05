@@ -41,7 +41,7 @@ class Recruiter {
                         [db.Op.or]: ['0', this.group, this.group[0]]
                     }
             }}))
-            .then(courses => courses.map(c => ({ userId: this.userId, courseId: c.id })))
+            .then(courses => courses.map(c => ({ userId: this.userId, courseId: c.id, group: this.group })))
             .then(ucItems => db.UserCourse.bulkCreate(ucItems))
     }
 }
