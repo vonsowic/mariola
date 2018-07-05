@@ -9,7 +9,8 @@ const intentionTriggers = require('./triggers/intention');
 const exchangeTriggers = require('./triggers/exchange');
 const courseTriggers = require('./triggers/course');
 const userFacultyTriggers = require('./triggers/user-faculty');
-const importPlan = require('utils/import-plan');
+const { createCronJob } = require('./cron-jobs/update-faculty-plans');
+const { importPlan }= require('utils/import-plan');
 
 const db = new Sequelize(
     process.env.DATABASE_URL,
@@ -23,7 +24,14 @@ const db = new Sequelize(
 const User = db.define('users', user);
 const Intention = db.define('intentions', {});
 const Faculty = db.define('faculties', faculty);
-const Course = db.define('courses', course);
+const Course = db.define('courses', course, {
+    indexes: [
+        {
+            unique: true,
+            fields: ['name', 'group', 'facultyId']
+        }
+    ]
+});
 const UserCourse = db.define('user_course', {});
 const CourseDetail = db.define('courses_details', courseDetail);
 const Exchanged = db.define('exchanges', {});
@@ -79,3 +87,6 @@ Exchanged.afterCreate(exchangeTriggers.removeIntentionAfterExchanged(module.expo
 Course.beforeValidate(courseTriggers.insertDefaultMaxStudentsNumber);
 
 UserFaculty.afterDestroy(userFacultyTriggers.removeUsersDataAfterLeaving(db));
+
+// install cron job
+createCronJob(module.exports);

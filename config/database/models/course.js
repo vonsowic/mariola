@@ -9,9 +9,9 @@ module.exports = {
         type: Symbol.STRING(2),
         required: true
     },
-    other: Symbol.STRING(256),
     maxStudentsNumber: {
         type: Symbol.INTEGER,
         defaultValue: null
-    }
+    },
+    other: Symbol.STRING(256),
 };
