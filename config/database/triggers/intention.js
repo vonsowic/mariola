@@ -2,8 +2,26 @@ const Op = require('sequelize').Op;
 const {
     NotFound,
     BadRequest,
-    Conflict
+    Conflict,
+    Locked
 } = require('utils/errors');
+
+const checkIfExchangesEnabled = db => async intention => {
+    if ( !(await areExchangesEnabled(db))) {
+        throw new Locked()
+    }
+};
+
+
+const areExchangesEnabled = db => db.Faculty
+    .findOne({
+        attributes: ['exchangesEnabled'],
+        where: db
+            .connection
+            .literal(`id IN (SELECT "facultyId" FROM courses WHERE id=${intention.forId})`)
+    })
+    .then(res => res.exchangesEnabled);
+
 
 const ensureIntentionIsOk = db => async intention => {
     const forCourse = await db.Course
@@ -105,7 +123,11 @@ const isTransferWithoutExchangeEnabled = (db, {whatId}) => db.Faculty
     })
     .then(res => res.transferWithoutExchangeEnabled);
 
-const isMembersNumberSmallerThanMaximum = async (db, {forId}) => false
+const isMembersNumberSmallerThanMaximum = (db, {forId}) => db.connection
+    .query(`SELECT (SELECT COUNT(*) FROM user_courses WHERE "courseId"=${forId}) 
+                 < (SELECT "maxStudentsNumber" FROM courses WHERE id=${forId}) 
+                 AS result LIMIT 1;`)
+    .then(r => console.log(r[0][0].result));
 
 const transferStudent = ({Exchanged}, intention) => Exchanged
     .create(intention);
@@ -114,5 +136,6 @@ const transferStudent = ({Exchanged}, intention) => Exchanged
 module.exports={
     ensureIntentionIsOk,
     exchangeIfMatched,
-    transferWithoutExchangeIfPossible
+    transferWithoutExchangeIfPossible,
+    checkIfExchangesEnabled
 };
