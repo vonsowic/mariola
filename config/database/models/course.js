@@ -13,9 +13,5 @@ module.exports = {
     maxStudentsNumber: {
         type: Symbol.INTEGER,
         defaultValue: null
-    },
-    externalId: {
-        type: Symbol.STRING(40),
-        required: true
     }
 };
