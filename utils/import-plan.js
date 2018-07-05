@@ -1,18 +1,21 @@
 const eaiibDownloader = require('./eaiib');
 
-module.exports = db => async faculty => {
-    for(let courseItem of await eaiibDownloader(faculty.url)){
-        courseItem.facultyId = faculty.id;
-
-        db.Course
-            .create(courseItem)
-            .then(savedCourse => courseItem
-                .courseDetails
-                .map(detail => ({
-                    start: detail.start,
-                    end: detail.end,
-                    courseId: savedCourse.id
-                })))
-            .then(details => db.CourseDetail.bulkCreate(details))
-    }
-};
+/**
+ * This function is also installed as database hook, so leave it as closure.
+ */
+module.exports = db => faculty =>
+    eaiibDownloader(faculty.url)
+        .then(items => items
+            .map(item => Object.assign({}, item, {facultyId: faculty.id}))
+            .map(item => db.Course
+                .create(item)
+                .then(savedCourse => items
+                    .map(item => Object.assign({}, item, {
+                        coursesDetails: item
+                            .coursesDetails
+                            .map(cd => Object.assign({}, cd, {courseId: savedCourse.id}))
+                    }))
+                    .map(item => db
+                        .CourseDetail
+                        .bulkCreate(item.coursesDetails)
+                        .then(() => ({created: true}))))));
