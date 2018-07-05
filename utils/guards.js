@@ -26,14 +26,23 @@ const ensureFacultyMember = (idGetter=defaultIdGetter) => (req, res, next) => {
 
 const ensureAuthenticated = passport.authenticate('jwt', {session: false})
 
-
 const ensureIsAdmin = (idGetter=defaultIdGetter) => (req, res, next) => {
-    if(req.user.faculties[idGetter(req)]){
+    if(req.user.faculties[idGetter(req)].isAdmin){
         next()
     } else {
         res
             .status(403)
-            .send({message: 'You are not the root!'})
+            .send({message: 'You are not an admin!'})
+    }
+};
+
+const ensureNotBanned = (idGetter=defaultIdGetter) => (req, res, next) => {
+    if(req.user.faculties[idGetter(req)].isBanned){
+        next()
+    } else {
+        res
+            .status(403)
+            .send({message: 'You banned from this faculty!'})
     }
 };
 
@@ -57,5 +66,6 @@ module.exports={
     ensureFacultyMember,
     ensureIsAdmin,
     ensureNotLogout,
+    ensureNotBanned,
     unauthenticate
 };
