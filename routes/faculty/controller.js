@@ -101,14 +101,15 @@ router.get('/:facultyId/groups', (req, res, next) => {
 
 // ADMIN ENDPOINTS
 router.get('/:facultyId/members', ensureIsAdmin(), (req, res, next) => {
-    db.User
-        .findAll({
-            attributes: ['id', 'name', 'lastName'],
-            where: {
-                // TODO
-            }
+    db.Faculty
+        .findById(req.params.facultyId, {
+            attributes: [],
+            include: [{
+                model: db.User,
+                attributes: ['id', 'name', 'lastName']
+            }]
         })
-        .then(members => res.send(members))
+        .then(({users}) => res.send(users))
         .catch(err => next(err))
 });
 
@@ -119,18 +120,6 @@ router.patch('/:facultyId/:userId/ban', ensureIsAdmin(), (req, res, next) => {
         }, {
             userId: req.params.userId,
             facultyId: req.params.facultyId
-        })
-        .then(result => res.send(result))
-        .catch(err => next(err))
-});
-
-router.patch('/:facultyId/:courseName/maxStudentsNumber', ensureIsAdmin(), (req, res, next) => {
-    db.Course
-        .update({
-            maxStudentsNumber: req.body.maxStudentsNumber
-        }, {
-            facultyId: req.params.facultyId,
-            name: req.params.courseName
         })
         .then(result => res.send(result))
         .catch(err => next(err))
