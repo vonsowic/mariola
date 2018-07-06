@@ -30,7 +30,7 @@ describe('Exchanges tests', () => {
         await addUserToFaculty(user1, facultyId);
         await addUserToFaculty(user2, facultyId);
 
-        otherFacultyId = (await createFaculty('Automatyka', 'dummy url')).id;
+        otherFacultyId = (await createFaculty('Automatyka')).id;
         await addUserToFaculty(user2, otherFacultyId);
 
         c1g0 = (await createCourse(facultyId, 'Study of Ancient Runes', '0')).id;

@@ -22,9 +22,9 @@ describe('Faculty endpoints', () => {
         let usersFaculty, otherFaculty;
 
         beforeEach(async () => {
-            usersFaculty = await createFaculty("Informatyka", "unnecessary url 1");
+            usersFaculty = await createFaculty("Informatyka");
             await addUserToFaculty(tester.id, usersFaculty.id);
-            otherFaculty = await createFaculty("Automatyka", "unnecessary url 2");
+            otherFaculty = await createFaculty("Automatyka");
         });
 
         const fetch = (query={}) => request()

@@ -26,7 +26,7 @@ describe('Faculty endpoints', () => {
         faculty = await createFaculty();
         await addUserToFaculty(tester.id, faculty.id);
 
-        otherFaculty = await createFaculty('Automatyka', 'dummy url');
+        otherFaculty = await createFaculty('Automatyka');
         await addUserToFaculty(otherUser.id, faculty.id);
 
         c1g0 = await createCourse(faculty.id, 'Study of Ancient Runes', '0');
@@ -111,7 +111,7 @@ describe('Faculty endpoints', () => {
             it('Intention should not be created', done => {
                 fetch(f2c1g1.id)
                     .end((err, res) => {
-                        assert.equal(res.status, 400);
+                        assert.equal(res.status, 403);
                         done()
                     })
             })

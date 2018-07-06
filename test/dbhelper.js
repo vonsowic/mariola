@@ -5,11 +5,12 @@ const initializeDatabase = () => db
     .connection
     .sync({force: true});
 
-const createFaculty = (name, url) =>
+const createFaculty = (name, url, exchangesEnabled=true) =>
     db.Faculty
         .create({
             name,
-            url: url || 'http://student.agh.edu.pl/~miwas/plan-mocks.json'
+            url: url || 'http://student.agh.edu.pl/~miwas/empty.json',
+            exchangesEnabled
         });
 
 const createUser = (fbProfileId=process.env.RUN_AS, name='name', lastName='lastName') =>
