@@ -1,11 +1,14 @@
-const {BadRequest, Locked} = require('utils/errors');
+const db = require('database');
 const service = require('./service');
 const Recruiter = require('utils/Recruiter');
-const db = require('database');
-const { ensureIsAdmin, ensureFacultyMember, unauthenticate } = require('utils/guards');
-const { Conflict } = require('utils/errors');
+const guards= require('utils/guards');
+const {Conflict, BadRequest, Locked} = require('utils/errors');
+
 const router = require('express').Router();
 
+const ensureIsAdmin=guards.ensureIsAdmin(),
+    ensureFacultyMember=guards.ensureFacultyMember(),
+    unauthenticate=guards.unauthenticate;
 
 router.post('/create', (req, res, next) => {
     // disable endpoint
@@ -63,7 +66,8 @@ router.post('/join', (req, res, next) => {
         .catch(() => next(new Conflict("you are already member of this faculty")))
 });
 
-router.get('/:facultyId', ensureFacultyMember(), (req, res, next) => {
+
+router.get('/:facultyId', ensureFacultyMember, (req, res, next) => {
     db.Faculty
         .findById(req.params.facultyId, {
             attributes: ['id', 'name', 'exchangesEnabled', 'transferWithoutExchangeEnabled']
@@ -72,48 +76,62 @@ router.get('/:facultyId', ensureFacultyMember(), (req, res, next) => {
         .catch(err => next(err))
 });
 
-router.get('/:facultyId/admin', (req, res, next) => {
+
+router.get('/:facultyId/admins', (req, res, next) => {
     db.User
-        .findOne({
-            attributes: ["name", "lastName"],
-            where: db.connection.literal(`id in (
-                SELECT "userId" 
-                FROM user_faculties 
-                WHERE "facultyId"=${req.params.facultyId}
-                AND "isAdmin"='t'
-                ORDER BY "updatedAt"
-                LIMIT 1)`)
+        .findAll({
+            attributes: ['id', 'name', 'lastName'],
+            include: [{
+                model: db.Faculty,
+                attributes: [],
+                where: {
+                    id: req.params.facultyId
+                },
+                through: {
+                    attributes: [],
+                    where: {
+                        isAdmin: true
+                    }
+                }
+            }]
         })
         .then(admin => res.send(admin))
         .catch(err => next(err))
 });
 
+
 router.get('/:facultyId/groups', (req, res, next) => {
-    db.Course.findAll({
-        where: {facultyId: req.params.facultyId},
-        attributes: [[db.sequelize.fn('DISTINCT', db.sequelize.col('group')), 'group']]
-    })
-        .map(g => g.group)
-        .filter(g => g.length === 2)
+    db.Course
+        .findAll({
+            where: {
+                facultyId: req.params.facultyId
+            },
+            attributes: [[db.sequelize.fn('DISTINCT', db.sequelize.col('group')), 'group']]
+        })
+        .map(({group}) => group)
+        .filter(({length}) => length === 2)
         .then(groups => res.send(groups))
         .catch(err => next(err))
 });
 
 // ADMIN ENDPOINTS
-router.get('/:facultyId/members', ensureIsAdmin(), (req, res, next) => {
+router.get('/:facultyId/members', ensureIsAdmin, (req, res, next) => {
     db.Faculty
         .findById(req.params.facultyId, {
             attributes: [],
             include: [{
                 model: db.User,
-                attributes: ['id', 'name', 'lastName']
+                attributes: ['id', 'name', 'lastName'],
+                through: {
+                    attributes: ['isAdmin', 'isBanned', 'group']
+                }
             }]
         })
         .then(({users}) => res.send(users))
         .catch(err => next(err))
 });
 
-router.patch('/:facultyId/:userId/ban', ensureIsAdmin(), (req, res, next) => {
+router.patch('/:facultyId/:userId/ban', ensureIsAdmin, (req, res, next) => {
     db.UserFaculty
         .update({
             isBanned: req.body.isBanned
@@ -125,27 +143,25 @@ router.patch('/:facultyId/:userId/ban', ensureIsAdmin(), (req, res, next) => {
         .catch(err => next(err))
 });
 
-router.patch('/:facultyId', ensureIsAdmin(), (req, res, next) => {
+router.patch('/:facultyId', ensureIsAdmin, (req, res, next) => {
     db.Faculty
-        .update(
+        .findById(req.params.facultyId)
+        .then(f => f.update(
             Object.assign({},
                 req.body.exchangesEnabled !== undefined ?
                     {exchangesEnabled: req.body.exchangesEnabled}
                     : {},
                 req.body.transferWithoutExchangeEnabled !== undefined
                     ? {transferWithoutExchangeEnabled: req.body.transferWithoutExchangeEnabled}
-                    : {}), {
-                where: {
-                    id: req.params.facultyId
-                }
-            })
+                    : {})))
         .then(result => res.send(result))
         .catch(err => next(err))
 });
 
 
-router.delete('/:facultyId', ensureIsAdmin(), (req, res) => {
-    db.Faculty.destroy({ where: {id: req.params.facultyId}});
+router.delete('/:facultyId', ensureIsAdmin, (req, res) => {
+    db.Faculty
+        .destroy({ where: {id: req.params.facultyId}});
 
     res
         .status(204)

@@ -1,44 +1,105 @@
+const {NotFound, NotAllowed} = require('utils/errors');
+
 const router = require('express').Router();
-const service = require('./service');
-const { ensureFacultyMember } = require('utils/guards');
-const { NotAllowed } = require('utils/errors');
+const db = require('database');
+const guards = require('utils/guards');
 
-router.get('/:facultyId', ensureFacultyMember(), (req, res, next) => {
-    service.findAllIntentionsByFacultyId(req.params.facultyId)
-        .then(exchanges => res.send(exchanges))
+const ensureFacultyMember=guards.ensureFacultyMember(req => req.query.facultyId)
+    , ensureNotBanned=guards.ensureNotBanned(req => req.query.facultyId);
+
+
+
+const withCourse = (as, facultyId) => ({
+    attributes: ['id', 'name', 'group'],
+    model: db.Course,
+    where: {
+        facultyId
+    },
+    as
+});
+
+const withUser = () => ({
+    attributes: ['id', 'name', 'lastName'],
+    model: db.User,
+    as: 'from'
+});
+
+
+router.get('/', ensureFacultyMember, ensureNotBanned, (req, res, next) => {
+    db.Intention
+        .findAll({
+            attributes: ['id', 'createdAt'],
+            include: [
+                withUser(),
+                withCourse('what', req.query.facultyId),
+                withCourse('for', req.query.facultyId)
+            ],
+            order: [
+                ['createdAt', 'DESC']
+            ],
+            limit: req.query.limit,
+            offset: req.query.offset,
+        })
+        .then(result => {
+            if( !result ) {
+                throw new NotFound()
+            }
+
+            res.send(result)
+        })
         .catch(err => next(err))
 });
 
 
-router.get('/:facultyId/:intentionId', ensureFacultyMember(), (req, res, next) => {
-    service.findOneIntentionById(req.params.intentionId, req.params.facultyId)
-        .then(result => res.send(result))
+router.get('/:intentionId', ensureFacultyMember, ensureNotBanned, (req, res, next) => {
+    db.Intention
+        .findOne({
+            attributes: ['id', 'createdAt'],
+            where: {
+                fromId: req.user.id,
+                id: req.params.intentionId
+            },
+            include: [
+                withUser(),
+                withCourse('what', req.query.facultyId),
+                withCourse('for', req.query.facultyId)
+            ]
+        })
+        .then(result => {
+            if( !result ) {
+                throw new NotFound()
+            }
+            res.send(result)
+        })
         .catch(err => next(err))
 });
 
-// TODO: ensure faculty member in trigger
+
 router.post('/', (req, res, next) => {
-    service.create(req.body.forId, req.user.id)
+    db.Intention
+        .create({
+            forId: req.body.forId,
+            fromId: req.user.id
+        })
         .then(ex => res.send({id: ex.id}))
         .catch(err => next(err))
 });
 
 
-router.delete('/:intentionId', async (req, res, next) => {
-    try {
-        const ei = await service.findOneIntentionById(req.params.intentionId);
+router.delete('/:intentionId', (req, res, next) => {
+    db.Intention
+        .findById(req.params.intentionId)
+        .then(intention => {
+            if (intention.fromId !== req.user.id) {
+                throw new NotAllowed()
+            }
 
-        if( ei.userId !== req.user.id) {
-            throw new NotAllowed()
-        }
-
-        service.remove(req.params.intentionId)
-            .then(() => res
-                .status(204)
-                .end())
-    } catch (err) {
-        next(err)
-    }
+            return intention.destroy()
+        })
+        .then(() => res
+            .status(204)
+            .end())
+        .catch(err => next(err))
 });
 
 

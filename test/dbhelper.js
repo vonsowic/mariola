@@ -43,10 +43,10 @@ const assignCourse = (userId, courseId) =>
             courseId
         });
 
-const createIntention = (userFrom, forId) =>
+const createIntention = (fromId, forId) =>
     db.Intention
         .create({
-            userFrom,
+            fromId,
             forId
         });
 

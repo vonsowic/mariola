@@ -81,8 +81,7 @@ describe('Exchanges tests', () => {
         await createIntention(user2, c2g1);
         await createIntention(testerId, c2g2);
 
-        const e = await Exchanged.findOne();
-        const {count} = await Exchanged.findAndCountAll();
+
         // assert.equal(e.userFrom, user2);
         // assert.equal(e.userTo, testerId);
         // assert.equal(e.whatId, c2g2);

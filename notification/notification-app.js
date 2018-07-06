@@ -85,8 +85,8 @@ const onNewExchangeListener = record => {
         }
     };
 
-    notifyIfPossible(record.userFrom);
-    notifyIfPossible(record.userTo);
+    notifyIfPossible(record.fromId);
+    notifyIfPossible(record.toId);
 };
 
 new DBBridge()
@@ -102,5 +102,3 @@ module.exports= port => {
 
     return server
 };
-
-// module.exports(5001)

@@ -39,36 +39,35 @@ const findWithNumberOfDetailsAndStudents = facultyId=> db.connection.query(`
     NATURAL JOIN usertmp utmp
     NATURAL JOIN cdtmp cd
     NATURAL JOIN maxnumenabled mne
-    WHERE c."facultyId"=${facultyId};`);
+    WHERE c."facultyId"=${facultyId};`)
+    .then(res => res[0])
 
 
-const findCoursesIdsByUserId = userId =>
-    db.Course.findAll({
-        attributes: ['id'],
-        where: db.connection
-            .literal(`courses.id IN (SELECT "courseId" FROM user_courses WHERE "userId"=${userId})`)
-    })
+const findCoursesIdsByUserId = id =>
+    db.Course
+        .findAll({
+            attributes: ['id'],
+            include: [{
+                model: db.User,
+                where: { id },
+                through: false
+            }]
+        })
         .map(({id}) => id);
 
 
 const findAll=(where={}, include=[]) =>
-    db.Course.findAll({
-        attributes: ['id', 'name', 'group', 'other'],
-        include,
-        where,
-        raw: true
-    });
+    db.Course
+        .findAll({
+            attributes: ['id', 'name', 'group', 'other'],
+            include,
+            where,
+            raw: true
+        });
 
 
 const findAllByFaculty=(facultyId, include=[]) =>
     findAll({facultyId}, include);
-
-
-const withUser = userId =>({
-    model: db.User,
-    attributes: [],
-    where: {id: userId}
-});
 
 
 const withDetails= interval =>({
@@ -90,5 +89,4 @@ module.exports={
     findAll,
     findAllByFaculty,
     withDetails,
-    withUser
 };

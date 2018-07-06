@@ -7,7 +7,7 @@ const blacklistedDecryptedTokens = new Set;
 const unauthenticate = user => {
     const encryptedUser = encryptUser(user);
     blacklistedDecryptedTokens.add(encryptedUser);
-    // setTimeout(() => blacklistedDecryptedTokens.remove(encryptedUser), (user.exp - user.iat) * 1000)
+    setTimeout(() => blacklistedDecryptedTokens.remove(encryptedUser), (user.exp - user.iat) * 1000)
 };
 
 
@@ -37,7 +37,7 @@ const ensureIsAdmin = (idGetter=defaultIdGetter) => (req, res, next) => {
 };
 
 const ensureNotBanned = (idGetter=defaultIdGetter) => (req, res, next) => {
-    if(req.user.faculties[idGetter(req)].isBanned){
+    if(!req.user.faculties[idGetter(req)].isBanned){
         next()
     } else {
         res
@@ -58,7 +58,7 @@ const ensureNotLogout = (req, res, next) => {
 };
 
 
-const defaultIdGetter = req => req.params.facultyId || req.body.facultyId;
+const defaultIdGetter = req => req.params.facultyId || req.query.facultyId;
 
 
 module.exports={

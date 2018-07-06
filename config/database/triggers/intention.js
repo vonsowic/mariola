@@ -1,26 +1,65 @@
-const Op = require('sequelize').Op;
+const { Promise, Op } = require('sequelize');
 const {
     NotFound,
+    NotAllowed,
     BadRequest,
     Conflict,
-    Locked
+    Locked,
+    NoContent
 } = require('utils/errors');
 
-const checkIfExchangesEnabled = db => async intention => {
-    if ( !(await areExchangesEnabled(db))) {
+
+const ensureExchangesEnabled = db => async intention => {
+    if ( !(await areExchangesEnabled(db, intention))) {
         throw new Locked()
     }
 };
 
-
-const areExchangesEnabled = db => db.Faculty
+const areExchangesEnabled = (db, intention) => db.Faculty
     .findOne({
         attributes: ['exchangesEnabled'],
         where: db
             .connection
             .literal(`id IN (SELECT "facultyId" FROM courses WHERE id=${intention.forId})`)
     })
-    .then(res => res.exchangesEnabled);
+    .then(res => {
+        if ( !res ) {
+            throw new NotFound()
+        }
+
+        return res.exchangesEnabled
+    });
+
+
+const ensureUserAllowedToCreateIntention = db => intention =>
+    db.Faculty
+        .findOne({
+            attributes: [],
+            include: [{
+                model: db.User,
+                where: {
+                    id: intention.fromId
+                },
+                through: {
+                    attributes: [],
+                    where: {
+                        isBanned: false
+                    }
+                }
+            }, {
+                model: db.Course,
+                where: {
+                    id: intention.forId
+                }
+            }]
+        })
+        .then(isAllowed => {
+            if(!isAllowed) {
+                throw new NotAllowed()
+            }
+        });
+
+
 
 
 const ensureIntentionIsOk = db => async intention => {
@@ -43,15 +82,12 @@ const ensureIntentionIsOk = db => async intention => {
                 facultyId: forCourse.facultyId,
                 group: {
                     [Op.ne]: '0'
-                },
-                id: {
-                    [Op.ne]: forCourse.id
                 }
             },
             include: [{
                 model: db.User,
                 where: {
-                    id: intention.userFrom
+                    id: intention.fromId
                 }
             }]
         });
@@ -61,16 +97,19 @@ const ensureIntentionIsOk = db => async intention => {
         throw new BadRequest("Is it possible what you are trying to do?")
     }
 
+    if(whatCourse.id === intention.forId){
+        throw new BadRequest("You are already member of this group")
+    }
+
     intention.whatId = whatCourse.id;
 
     if(await db.Intention.findOne({
             where: {
-                userFrom: intention.userFrom,
+                fromId: intention.fromId,
                 whatId: intention.whatId,
-                forId: intention.forId,
             }
     })) {
-        throw new Conflict("Intention already exist")
+        throw new Conflict(`You have already declared your willingness to attend to group ${whatCourse.group} of ${whatCourse.name}`)
     }
 };
 
@@ -89,25 +128,28 @@ const exchangeIfMatched = db => intention => {
                     .create({
                         whatId: matchedIntention.whatId,
                         forId: matchedIntention.forId,
-                        userFrom: matchedIntention.userFrom,
-                        userTo: intention.userFrom
+                        fromId: matchedIntention.fromId,
+                        toId: intention.fromId
                     })
             }
         })
 };
 
-const transferWithoutExchangeIfPossible = db => async intention => {
+const transferWithoutExchangeIfPossible = db => async intention =>
     Promise
         .all([
             isTransferWithoutExchangeEnabled(db, intention),
-            isMembersNumberSmallerThanMaximum(db, intention)
+            isMembersNumberSmallerThanMaximum(db, intention.forId)
         ])
         .then(conditions => {
             if(conditions.every(x=>x)) {
-                transferStudent(db, intention)
+                return transferStudent(db, intention)
+                    .then(() => {
+                        throw new NoContent('Exchanged')
+                    })
             }
-        })
-};
+        });
+
 
 const isTransferWithoutExchangeEnabled = (db, {whatId}) => db.Faculty
     .findOne({
@@ -123,19 +165,29 @@ const isTransferWithoutExchangeEnabled = (db, {whatId}) => db.Faculty
     })
     .then(res => res.transferWithoutExchangeEnabled);
 
-const isMembersNumberSmallerThanMaximum = (db, {forId}) => db.connection
-    .query(`SELECT (SELECT COUNT(*) FROM user_courses WHERE "courseId"=${forId}) 
-                 < (SELECT "maxStudentsNumber" FROM courses WHERE id=${forId}) 
+const isMembersNumberSmallerThanMaximum = (db, courseId) => db.connection
+    .query(`SELECT (SELECT COUNT(*) FROM user_courses WHERE "courseId"=${courseId}) 
+                 < (SELECT "maxStudentsNumber" FROM courses WHERE id=${courseId}) 
                  AS result LIMIT 1;`)
-    .then(r => console.log(r[0][0].result));
+    .then(r => r[0][0].result);
 
 const transferStudent = ({Exchanged}, intention) => Exchanged
-    .create(intention);
+    .create({
+        fromId: intention.fromId,
+        toId: null,
+        whatId: intention.whatId,
+        forId: intention.forId,
+    });
+
 
 
 module.exports={
     ensureIntentionIsOk,
     exchangeIfMatched,
     transferWithoutExchangeIfPossible,
-    checkIfExchangesEnabled
+    ensureExchangesEnabled,
+    ensureUserAllowedToCreateIntention,
+
+    isMembersNumberSmallerThanMaximum,
+    transferStudent
 };

@@ -12,23 +12,27 @@ const formatFaculties = faculties => faculties
     .reduce((acc, it) =>
             Object.assign(
                 acc, {
-                    [it['id']]: it['user_faculty']['isAdmin']
+                    [it['id']]: {
+                        isAdmin: it['user_faculty']['isAdmin'],
+                        isBanned: it['user_faculty']['isBanned']
+                    }
                 }),
         {});
 
 
 
-module.exports = fbProfileId => db.User.findOne({
-    where: { fbProfileId },
-    attributes: ['id', 'name', 'lastName', 'fbProfileId'],
-    include: {
-        model: db.Faculty,
-        attributes: ['id'],
-        through: {
-            model: db.UserFaculty,
-            attributes: ['isAdmin'],
+module.exports = fbProfileId => db.User
+    .findOne({
+        where: { fbProfileId },
+        attributes: ['id', 'name', 'lastName', 'fbProfileId'],
+        include: {
+            model: db.Faculty,
+            attributes: ['id'],
+            through: {
+                model: db.UserFaculty,
+                attributes: ['isAdmin', 'isBanned'],
+            }
         }
-    }
-})
+    })
     .then(u => formatUser(u))
     .catch(() => null);

@@ -35,10 +35,17 @@ class Locked extends RequestError {
     }
 }
 
+class NoContent extends RequestError {
+    constructor(message='ok') {
+        super(204, message)
+    }
+}
+
 module.exports={
     BadRequest,
     NotAllowed,
     Conflict,
     NotFound,
-    Locked
+    Locked,
+    NoContent
 };

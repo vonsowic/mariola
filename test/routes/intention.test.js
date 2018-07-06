@@ -50,11 +50,14 @@ describe('Faculty endpoints', () => {
                 .create({
                     whatId: c1g1.id,
                     forId: c1g2.id,
-                    userFrom: tester.id,
+                    fromId: tester.id,
                 });
 
             const res = await request()
-                .get(`/api/intentions/${faculty.id}`)
+                .get(`/api/intentions`)
+                .query({
+                    facultyId: faculty.id
+                });
 
             assert.equal(res.body.length, 1, 'There should be only one intention');
         });
@@ -67,13 +70,16 @@ describe('Faculty endpoints', () => {
                 .create({
                     whatId: c1g1.id,
                     forId: c1g2.id,
-                    userFrom: tester.id,
+                    fromId: tester.id,
                 })
         });
 
         it('Should return list with one exchange intention', done => {
             request()
-                .get(`/api/intentions/${faculty.id}/${intention.id}`)
+                .get(`/api/intentions/${intention.id}`)
+                .query({
+                    facultyId: faculty.id
+                })
                 .end((err, res) => {
                     assert.equal(res.body.id, intention.id);
                     done()
@@ -99,7 +105,7 @@ describe('Faculty endpoints', () => {
                 await Intention
                     .create({
                         forId: c1g2.id,
-                        userFrom: tester.id
+                        fromId: tester.id
                     });
 
                 const res = await fetch(c1g2.id);
@@ -146,7 +152,7 @@ describe('Faculty endpoints', () => {
                     .create({
                         whatId: c1g1.id,
                         forId: c1g2.id,
-                        userFrom: tester.id,
+                        fromId: tester.id,
                     })
             });
 
@@ -168,15 +174,15 @@ describe('Faculty endpoints', () => {
 
         describe('When user is not creator of intention', () => {
             it('Exchange intention should be removed', async () => {
-                const intention = await Intention
+                let intention = await Intention
                     .create({
                         whatId: c1g2.id,
                         forId: c1g1.id,
-                        userFrom: otherUser.id,
+                        fromId: otherUser.id,
                     });
 
                 const res = await request()
-                    .delete(`/api/intentions/${intention.id}`)
+                    .delete(`/api/intentions/${intention.id}`);
 
                 assert.equal(res.status, 403);
             })

@@ -9,7 +9,9 @@ const intentionTriggers = require('./triggers/intention');
 const exchangeTriggers = require('./triggers/exchange');
 const courseTriggers = require('./triggers/course');
 const userFacultyTriggers = require('./triggers/user-faculty');
-const { createCronJob } = require('./cron-jobs/update-faculty-plans');
+const userCourseTriggers = require('./triggers/user-course');
+const facultyTriggers = require('./triggers/faculty');
+const updateFacultyPlansCron = require('./cron-jobs/update-faculty-plans').createCronJob;
 const { importPlan }= require('utils/import-plan');
 
 const db = new Sequelize(
@@ -47,15 +49,15 @@ Course.belongsToMany(User, {through: UserCourse});
 
 Faculty.hasMany(Course, {onDelete: 'CASCADE'});
 Course.hasMany(CourseDetail, {foreignKey: 'courseId', onDelete: 'CASCADE'});
-Course.hasMany(Exchanged, {foreignKey: 'whatId', onDelete: 'CASCADE'});
-Course.hasMany(Exchanged, {foreignKey: 'forId', onDelete: 'CASCADE'});
-Course.hasMany(Intention, {foreignKey: 'whatId', onDelete: 'CASCADE'});
-Course.hasMany(Intention, {foreignKey: 'forId', onDelete: 'CASCADE'});
 
-User.hasMany(Intention, {foreignKey: 'userFrom', onDelete: 'CASCADE'});
-User.hasMany(Exchanged, {foreignKey: 'userFrom', onDelete: 'CASCADE'});
-User.hasMany(Exchanged, {foreignKey: 'userTo', onDelete: 'CASCADE'});
+Intention.belongsTo(Course, {as: 'what', onDelete: 'CASCADE'});
+Intention.belongsTo(Course, {as: 'for', onDelete: 'CASCADE'});
+Intention.belongsTo(User, {as: 'from', onDelete: 'CASCADE'});
 
+Exchanged.belongsTo(User, {as: 'from', onDelete: 'CASCADE'});
+Exchanged.belongsTo(User, {as: 'to', onDelete: 'CASCADE'});
+Exchanged.belongsTo(Course, {as: 'what', onDelete: 'CASCADE'});
+Exchanged.belongsTo(Course, {as: 'for', onDelete: 'CASCADE'});
 
 module.exports = {
     Op: Sequelize.Op,
@@ -74,8 +76,11 @@ module.exports = {
 
 // TRIGGERS
 Faculty.afterCreate(importPlan(module.exports));
+Faculty.afterUpdate(facultyTriggers.transferAllWithoutExchangeIfPossible(module.exports));
+UserCourse.afterUpdate(userCourseTriggers.transferStudentIfHisDreamedGroupBecameAvailable(module.exports));
 
-Intention.beforeValidate(intentionTriggers.checkIfExchangesEnabled(module.exports));
+Intention.beforeValidate(intentionTriggers.ensureExchangesEnabled(module.exports));
+Intention.beforeValidate(intentionTriggers.ensureUserAllowedToCreateIntention(module.exports));
 Intention.beforeValidate(intentionTriggers.ensureIntentionIsOk(module.exports));
 Intention.beforeCreate(intentionTriggers.exchangeIfMatched(module.exports));
 Intention.beforeCreate(intentionTriggers.transferWithoutExchangeIfPossible(module.exports));
@@ -88,5 +93,6 @@ Course.beforeValidate(courseTriggers.insertDefaultMaxStudentsNumber);
 
 UserFaculty.afterDestroy(userFacultyTriggers.removeUsersDataAfterLeaving(db));
 
-// install cron job
-createCronJob(module.exports);
+
+// install cron jobs
+updateFacultyPlansCron(module.exports);

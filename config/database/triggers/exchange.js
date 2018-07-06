@@ -3,23 +3,23 @@ const {
 } = require('utils/errors');
 
 const ensureExchangeIsOk = () => exchange => {
-    if(exchange.userFrom === exchange.userTo){
+    if(exchange.fromId === exchange.userTo){
         throw new BadRequest("You can't exchange with yourself")
     }
 };
 
 const exchangeCourses = db => exchange => {
     db.UserCourse.update({
-        userId: exchange.userTo
+        courseId: exchange.forId
     }, {
         where: {
-            userId: exchange.userFrom,
+            userId: exchange.fromId,
             courseId: exchange.whatId
         }
     });
 
     db.UserCourse.update({
-        userId: exchange.userFrom
+        courseId: exchange.whatId
     }, {
         where: {
             userId: exchange.userTo,
@@ -28,21 +28,23 @@ const exchangeCourses = db => exchange => {
     })
 };
 
-const removeIntentionAfterExchanged = (db, Op) => (exchanged) => {
-    db.Intention.destroy({
-        where: {
-            [Op.or]: [{
-                userFrom: exchanged.userFrom,
-                whatId: exchanged.whatId,
-                forId: exchanged.forId
-            }, {
-                userFrom: exchanged.userTo,
-                whatId: exchanged.forId,
-                forId: exchanged.whatId,
-            }]
-        }
-    })
-};
+
+const removeIntentionAfterExchanged = (db, Op) => exchanged =>
+    db.Intention
+        .destroy({
+            where: {
+                [Op.or]: [{
+                    fromId: exchanged.fromId,
+                    whatId: exchanged.whatId,
+                    forId: exchanged.forId
+                }, {
+                    fromId: exchanged.toId,
+                    whatId: exchanged.forId,
+                    forId: exchanged.whatId,
+                }]
+            }
+        });
+
 
 module.exports={
     ensureExchangeIsOk,
