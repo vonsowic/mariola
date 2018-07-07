@@ -3,7 +3,7 @@ const {
 } = require('utils/errors');
 
 const ensureExchangeIsOk = () => exchange => {
-    if(exchange.fromId === exchange.userTo){
+    if(exchange.fromId === exchange.toId){
         throw new BadRequest("You can't exchange with yourself")
     }
 };
@@ -22,7 +22,7 @@ const exchangeCourses = db => exchange => {
         courseId: exchange.whatId
     }, {
         where: {
-            userId: exchange.userTo,
+            userId: exchange.toId,
             courseId: exchange.forId
         }
     })

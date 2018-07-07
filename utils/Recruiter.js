@@ -30,18 +30,20 @@ class Recruiter {
     }
 
     end(){
-        return db.UserFaculty.create({
-            userId: this.userId,
-            facultyId: this.facultyId,
-            isAdmin: this.isAdmin
-        })
+        return db.UserFaculty
+            .create({
+                userId: this.userId,
+                facultyId: this.facultyId,
+                isAdmin: this.isAdmin,
+                group: this.group
+            })
             .then(uf => db.Course.findAll({where: {
                     facultyId: uf.facultyId,
                     group:{
                         [db.Op.or]: ['0', this.group, this.group[0]]
                     }
             }}))
-            .then(courses => courses.map(c => ({ userId: this.userId, courseId: c.id, group: this.group })))
+            .then(courses => courses.map(c => ({ userId: this.userId, courseId: c.id})))
             .then(ucItems => db.UserCourse.bulkCreate(ucItems))
     }
 }

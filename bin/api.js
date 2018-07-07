@@ -5,11 +5,6 @@ const debug = require('debug')('test:server');
 const port = process.env.API_PORT || 5000;
 const https = require('http');
 const app = require('../app');
-const notificationService = require('notification-service');
-
-
-notificationService(process.env.NOTIFICATION_PORT || 5001);
-
 
 app.set('port', port);
 const server = https.createServer(app);
@@ -17,7 +12,6 @@ const server = https.createServer(app);
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
-
 
 
 function onError(error) {

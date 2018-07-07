@@ -61,7 +61,7 @@ router.post('/join', (req, res, next) => {
             unauthenticate(req.user);
             res
                 .status(201)
-                .end()
+                .send()
         })
         .catch(() => next(new Conflict("you are already member of this faculty")))
 });
@@ -131,14 +131,17 @@ router.get('/:facultyId/members', ensureIsAdmin, (req, res, next) => {
         .catch(err => next(err))
 });
 
-router.patch('/:facultyId/:userId/ban', ensureIsAdmin, (req, res, next) => {
+router.patch('/:facultyId/ban', ensureIsAdmin, (req, res, next) => {
     db.UserFaculty
-        .update({
-            isBanned: req.body.isBanned
-        }, {
-            userId: req.params.userId,
-            facultyId: req.params.facultyId
+        .findOne({
+            where: {
+                userId: req.query.userId,
+                facultyId: req.params.facultyId
+            }
         })
+        .then(uf => uf.update({
+            isBanned: req.body.isBanned
+        }))
         .then(result => res.send(result))
         .catch(err => next(err))
 });

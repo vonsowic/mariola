@@ -4,9 +4,7 @@ const router = require('express').Router();
 const db = require('database');
 const guards = require('utils/guards');
 
-const ensureFacultyMember=guards.ensureFacultyMember(req => req.query.facultyId)
-    , ensureNotBanned=guards.ensureNotBanned(req => req.query.facultyId);
-
+const ensureFacultyMember=guards.ensureFacultyMember(req => req.query.facultyId);
 
 
 const withCourse = (as, facultyId) => ({
@@ -25,7 +23,7 @@ const withUser = () => ({
 });
 
 
-router.get('/', ensureFacultyMember, ensureNotBanned, (req, res, next) => {
+router.get('/', ensureFacultyMember, (req, res, next) => {
     db.Intention
         .findAll({
             attributes: ['id', 'createdAt'],
@@ -51,7 +49,7 @@ router.get('/', ensureFacultyMember, ensureNotBanned, (req, res, next) => {
 });
 
 
-router.get('/:intentionId', ensureFacultyMember, ensureNotBanned, (req, res, next) => {
+router.get('/:intentionId', ensureFacultyMember, (req, res, next) => {
     db.Intention
         .findOne({
             attributes: ['id', 'createdAt'],

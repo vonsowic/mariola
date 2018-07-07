@@ -2,13 +2,15 @@ const router = require('express').Router();
 const service = require('./service');
 const db = require('database');
 const {getMondayDate, getSundayDate} = require('utils/datetime');
-let { ensureFacultyMember } = require('utils/guards');
+const { NotAllowed } = require('utils/errors');
+const guards = require('utils/guards');
 
 const normalizeDate = dateStr => dateStr
     ? dateStr.replace('"', '')
     : dateStr;
 
-ensureFacultyMember = ensureFacultyMember(req => req.query.facultyId);
+const ensureFacultyMember = guards.ensureFacultyMember(req => req.query.facultyId)
+    , ensureIsAdmin = guards.ensureIsAdmin(req => req.query.facultyId);
 
 router.get('/my', (req, res, next) => {
     db.Course
@@ -55,6 +57,22 @@ router.get('/', ensureFacultyMember, (req, res, next) => {
 
 router.get('/general', ensureFacultyMember, (req, res, next) => {
     service.findWithNumberOfDetailsAndStudents(req.query.facultyId)
+        .then(result => res.send(result))
+        .catch(err => next(err))
+});
+
+router.patch('/:courseId', ensureIsAdmin, (req, res, next) => {
+    db.Course
+        .findById(req.params.courseId)
+        .then(course => {
+            if (course.facultyId !== Number(req.query.facultyId)) {
+                throw new NotAllowed()
+            }
+
+            return course.update({
+                maxStudentsNumber: req.body.maxStudentsNumber
+            })
+        })
         .then(result => res.send(result))
         .catch(err => next(err))
 });

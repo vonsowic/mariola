@@ -89,9 +89,11 @@ Exchanged.beforeValidate(exchangeTriggers.ensureExchangeIsOk());
 Exchanged.afterCreate(exchangeTriggers.exchangeCourses(module.exports));
 Exchanged.afterCreate(exchangeTriggers.removeIntentionAfterExchanged(module.exports, Sequelize.Op));
 
-Course.beforeValidate(courseTriggers.insertDefaultMaxStudentsNumber);
+Course.beforeValidate(courseTriggers.insertDefaultMaxStudentsNumber());
+Course.beforeUpdate(courseTriggers.ensureMaxNumberOfStudentsCanBeUpdated(module.exports));
 
-UserFaculty.afterDestroy(userFacultyTriggers.removeUsersDataAfterLeaving(db));
+UserFaculty.afterDestroy(userFacultyTriggers.removeUsersDataAfterLeaving(module.exports));
+UserFaculty.beforeUpdate(userFacultyTriggers.ensureAdminWontBeBanned());
 
 
 // install cron jobs

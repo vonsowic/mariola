@@ -34,7 +34,7 @@ router.get('/:exchangeId', (req, res, next) => {
                 .findOne({
                     attributes: ['id', 'name', 'group', ],
                     where: {
-                        id: exchanged.userFrom === req.user.id
+                        id: exchanged.fromId === req.user.id
                             ? exchanged.forId
                             : exchanged.whatId
                     }
@@ -43,7 +43,7 @@ router.get('/:exchangeId', (req, res, next) => {
                     id: c.id,
                     name: c.name,
                     group: c.group,
-                    previousId: exchanged.userFrom === req.user.id
+                    previousId: exchanged.fromId === req.user.id
                         ? exchanged.whatId
                         : exchanged.forId}))
         })

@@ -29,12 +29,13 @@ const findWithNumberOfDetailsAndStudents = facultyId=> db.connection.query(`
         c.id,
         c.name,
         c.group,
+        c.other,
         utmp."studentsCount"::Integer, 
-        (select case when mne.enabled='t' then c."maxStudentsNumber" else -1 end as "maxStudentsNumber"),
+        c."maxStudentsNumber",
         cd.frequency::Integer, 
         cd.dow as "dayOfWeek", 
         cd.st as start, 
-        cd.en as end 
+        cd.en as end
     FROM courses c 
     NATURAL JOIN usertmp utmp
     NATURAL JOIN cdtmp cd

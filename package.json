@@ -5,13 +5,16 @@
   "main": "app.js",
   "repository": "https://github.com/vonsowic/mariola",
   "scripts": {
-    "start": "node ./bin/www.js",
-    "server": "nodemon ./bin/www.js",
+    "start": "concurrently \"npm:api\" \"npm:notification\"",
+    "dev": "nodemon npm start",
+    "api": "node ./bin/www.js",
+    "notification": "node ./bin/notification.js",
     "test": "EXPIRATION_TIME_AS_SECONDS=900 CLIENT_ID=0 DATABASE_URL=postgres://localhost:5432/mariolatest RUN_AS=432165447 mocha --timeout 10000 --recursive --exit"
   },
   "dependencies": {
     "axios": "^0.18.0",
     "body-parser": "~1.18.2",
+    "concurrently": "^3.6.0",
     "cron": "^1.3.0",
     "database": "file:config/database",
     "debug": "~2.6.9",
