@@ -2,7 +2,7 @@ require('dotenv').config();
 require('database').connection.sync({force: process.env.DROP_DATABASE});
 
 const debug = require('debug')('test:server');
-const port = process.env.API_PORT || 5000;
+const port = process.env.PORT || 5000;
 const https = require('http');
 const app = require('../app');
 
