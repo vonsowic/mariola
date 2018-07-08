@@ -1,3 +1,5 @@
+const { Op } = require('sequelize')
+
 const {
     BadRequest,
 } = require('utils/errors');
@@ -29,7 +31,7 @@ const exchangeCourses = db => exchange => {
 };
 
 
-const removeIntentionAfterExchanged = (db, Op) => exchanged =>
+const removeIntentionAfterExchanged = db => exchanged =>
     db.Intention
         .destroy({
             where: {
@@ -45,9 +47,19 @@ const removeIntentionAfterExchanged = (db, Op) => exchanged =>
             }
         });
 
+const createNotifications = db => exchange =>
+    db.Notification
+        .bulkCreate([{
+            exchangeId: exchange.id,
+            userId: exchange.fromId
+        }, {
+            exchangeId: exchange.id,
+            userId: exchange.toId
+        }].filter(({userId}) => userId));
 
 module.exports={
     ensureExchangeIsOk,
     exchangeCourses,
     removeIntentionAfterExchanged,
+    createNotifications
 };

@@ -5,6 +5,7 @@ const userFaculty = require('./models/user-faculty');
 const courseDetail = require('./models/course-detail');
 const faculty = require('./models/faculty');
 const course = require('./models/course');
+const notification = require('./models/notification');
 const intentionTriggers = require('./triggers/intention');
 const exchangeTriggers = require('./triggers/exchange');
 const courseTriggers = require('./triggers/course');
@@ -23,10 +24,10 @@ const db = new Sequelize(
 
 
 // TABLES
-const User = db.define('users', user);
-const Intention = db.define('intentions', {});
-const Faculty = db.define('faculties', faculty);
-const Course = db.define('courses', course, {
+const User = db.define('user', user);
+const Intention = db.define('intention', {});
+const Faculty = db.define('faculty', faculty);
+const Course = db.define('course', course, {
     indexes: [
         {
             unique: true,
@@ -35,9 +36,10 @@ const Course = db.define('courses', course, {
     ]
 });
 const UserCourse = db.define('user_course', {});
-const CourseDetail = db.define('courses_details', courseDetail);
-const Exchanged = db.define('exchanges', {});
+const CourseDetail = db.define('courses_detail', courseDetail);
+const Exchanged = db.define('exchange', {});
 const UserFaculty = db.define('user_faculty', userFaculty);
+const Notification = db.define('notification', notification);
 
 
 // RELATIONS
@@ -59,6 +61,9 @@ Exchanged.belongsTo(User, {as: 'to', onDelete: 'CASCADE'});
 Exchanged.belongsTo(Course, {as: 'what', onDelete: 'CASCADE'});
 Exchanged.belongsTo(Course, {as: 'for', onDelete: 'CASCADE'});
 
+Notification.belongsTo(Exchanged, {as: 'exchange', onDelete: 'CASCADE'});
+Notification.belongsTo(User, {as: 'user', onDelete: 'CASCADE'});
+
 module.exports = {
     Op: Sequelize.Op,
     connection: db,
@@ -71,6 +76,7 @@ module.exports = {
     Exchanged,
     UserFaculty,
     UserCourse,
+    Notification
 };
 
 
@@ -87,7 +93,8 @@ Intention.beforeCreate(intentionTriggers.transferWithoutExchangeIfPossible(modul
 
 Exchanged.beforeValidate(exchangeTriggers.ensureExchangeIsOk());
 Exchanged.afterCreate(exchangeTriggers.exchangeCourses(module.exports));
-Exchanged.afterCreate(exchangeTriggers.removeIntentionAfterExchanged(module.exports, Sequelize.Op));
+Exchanged.afterCreate(exchangeTriggers.removeIntentionAfterExchanged(module.exports));
+Exchanged.afterCreate(exchangeTriggers.createNotifications(module.exports));
 
 Course.beforeValidate(courseTriggers.insertDefaultMaxStudentsNumber());
 Course.beforeUpdate(courseTriggers.ensureMaxNumberOfStudentsCanBeUpdated(module.exports));

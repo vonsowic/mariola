@@ -3,9 +3,12 @@ const logger = require('morgan');
 const bodyParser = require('body-parser');
 const passport = require('./config/passport-mariola/passport');
 const api = require('./routes/api');
+const cors = require('cors')
 
 const app = express();
 
+
+app.use(cors());
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
