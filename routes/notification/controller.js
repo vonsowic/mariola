@@ -1,11 +1,11 @@
-const {NotAllowed, BadRequest} = require('utils/errors');
+const { NotFound } = require('utils/errors');
 const router = require('express').Router();
 const db = require('database');
 
 router.get('/', (req, res, next) => {
     db.Notification
         .findAll(({
-            attributes: ['id', 'exchangeId'],
+            attributes: ['exchangeId'],
             where: {
                 userId: req.user.id,
                 wasRead: req.query.wasRead === 'true'
@@ -25,11 +25,7 @@ router.patch('/', (req, res, next) => {
         })
         .then(n => {
             if (!n) {
-                throw new BadRequest()
-            }
-
-            if ( n.userId !== req.user.id) {
-                throw new NotAllowed()
+                throw new NotFound()
             }
 
             return n
