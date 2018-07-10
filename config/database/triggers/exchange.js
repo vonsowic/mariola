@@ -35,15 +35,9 @@ const removeIntentionAfterExchanged = db => exchanged =>
     db.Intention
         .destroy({
             where: {
-                [Op.or]: [{
-                    fromId: exchanged.fromId,
-                    whatId: exchanged.whatId,
-                    forId: exchanged.forId
-                }, {
-                    fromId: exchanged.toId,
-                    whatId: exchanged.forId,
-                    forId: exchanged.whatId,
-                }]
+                fromId: exchanged.fromId,
+                whatId: exchanged.whatId,
+                forId: exchanged.forId
             }
         });
 

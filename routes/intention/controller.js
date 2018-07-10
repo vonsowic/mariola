@@ -51,12 +51,8 @@ router.get('/', ensureFacultyMember, (req, res, next) => {
 
 router.get('/:intentionId', ensureFacultyMember, (req, res, next) => {
     db.Intention
-        .findOne({
+        .findById(req.params.intentionId, {
             attributes: ['id', 'createdAt'],
-            where: {
-                fromId: req.user.id,
-                id: req.params.intentionId
-            },
             include: [
                 withUser(),
                 withCourse('what', req.query.facultyId),

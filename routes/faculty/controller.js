@@ -131,17 +131,20 @@ router.get('/:facultyId/members', ensureIsAdmin, (req, res, next) => {
         .catch(err => next(err))
 });
 
-router.patch('/:facultyId/ban', ensureIsAdmin, (req, res, next) => {
+router.patch('/:facultyId/:userId', ensureIsAdmin, (req, res, next) => {
     db.UserFaculty
         .findOne({
             where: {
-                userId: req.query.userId,
+                userId: req.params.userId,
                 facultyId: req.params.facultyId
             }
         })
-        .then(uf => uf.update({
-            isBanned: req.body.isBanned
-        }))
+        .then(uf => uf
+            .update(Object.assign({}, {
+                isBanned: req.body.isBanned
+            }, req.body.isAdmin ? {
+                isAdmin: true
+            } : {})))
         .then(result => res.send(result))
         .catch(err => next(err))
 });

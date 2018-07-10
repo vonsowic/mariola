@@ -113,27 +113,29 @@ const ensureIntentionIsOk = db => async intention => {
     }
 };
 
-const exchangeIfMatched = db => intention => {
-    db.Intention
-        .findOne({
-            where: {
-                whatId: intention.forId,
-                forId: intention.whatId,
-            },
-            order: ['createdAt'],
-        })
-        .then(matchedIntention => {
-            if(matchedIntention) {
-                db.Exchanged
-                    .create({
-                        whatId: matchedIntention.whatId,
-                        forId: matchedIntention.forId,
-                        fromId: matchedIntention.fromId,
-                        toId: intention.fromId
-                    })
-            }
-        })
-};
+const exchangeIfMatched = db => intention => db.Intention
+    .findOne({
+        where: {
+            whatId: intention.forId,
+            forId: intention.whatId,
+        },
+        order: ['createdAt'],
+    })
+    .then(matchedIntention => {
+        if(matchedIntention) {
+            return db.Exchanged
+                .create({
+                    whatId: matchedIntention.whatId,
+                    forId: matchedIntention.forId,
+                    fromId: matchedIntention.fromId,
+                    toId: intention.fromId
+                })
+                .then(() => {
+                    throw new NoContent()
+                })
+        }
+    });
+
 
 const transferWithoutExchangeIfPossible = db => async intention =>
     Promise

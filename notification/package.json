@@ -1,10 +1,13 @@
 {
   "name": "notification-service",
-  "main": "notification-app.js",
   "version": "0.0.1",
+  "main": "index.js",
   "dependencies": {
     "express": "^4.16.3",
     "pg": "^7.4.1",
     "websocket": "^1.0.25"
+  },
+  "scripts": {
+    "start": "node index.js"
   }
 }
