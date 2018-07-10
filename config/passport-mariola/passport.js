@@ -1,7 +1,10 @@
 const passport = require('passport');
 const FacebookStrategy = require('passport-facebook-token');
 const db = require('database');
-const userGetter = require('./user-db-getter');
+const {
+    findUser,
+    formatUser
+} = require('./user-db-getter');
 const isTestMode = require('utils/is-test-mode');
 
 const Strategy = isTestMode()
@@ -13,10 +16,10 @@ passport.use(new FacebookStrategy({
         clientSecret: process.env.CLIENT_SECRET
     },
     async (token, refreshToken, profile, done) => {
-        let user = await userGetter(profile.id);
+        let user = await findUser(profile.id);
 
         if(!user) {
-            user = await createUser(profile, token);
+            user = formatUser(await createUser(profile))
         }
 
         done(null, user);
@@ -26,14 +29,14 @@ passport.use(new FacebookStrategy({
 passport.use('jwt', new Strategy());
 
 
-function createUser(profile, token) {
-    return db.User.create({
-        name: profile.name.givenName,
-        lastName: profile.name.familyName,
-        email: profile.emails[0].value,
-        fbProfileId: profile.id,
-        accessToken: token
-    })
+function createUser(profile) {
+    return db.User
+        .create({
+            name: profile.name.givenName,
+            lastName: profile.name.familyName,
+            email: profile.emails[0].value,
+            fbProfileId: profile.id,
+        })
 }
 
 module.exports = passport;
