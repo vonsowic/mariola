@@ -23,6 +23,12 @@ class BadRequest extends RequestError{
     }
 }
 
+class Unauthorized extends RequestError {
+    constructor(message='Unauthorized') {
+        super(401, message)
+    }
+}
+
 class NotAllowed extends RequestError {
     constructor(message='you are not welcome here :/') {
         super(403, message)

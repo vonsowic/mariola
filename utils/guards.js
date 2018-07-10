@@ -31,6 +31,8 @@ const ensureFacultyMember = (idGetter=defaultIdGetter) => (req, res, next) => {
 
 const ensureAuthenticated = passport.authenticate('jwt', {session: false})
 
+const ensureAuthenticatedByRefreshToken = passport.authenticate('refresh', {session: false})
+
 const ensureIsAdmin = (idGetter=defaultIdGetter) => (req, res, next) => {
     try {
         if(req.user.faculties[idGetter(req)].isAdmin) {
@@ -66,4 +68,5 @@ module.exports={
     ensureIsAdmin,
     ensureNotLogout,
     unauthenticate,
+    ensureAuthenticatedByRefreshToken
 };

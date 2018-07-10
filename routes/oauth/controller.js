@@ -1,38 +1,38 @@
 const router = require('express').Router();
 const passport = require('passport-mariola');
-const jwt = require('passport-mariola/jwt');
-const salt = require('passport-mariola/salt');
-const jsonwebtoken = require('jsonwebtoken');
-const ensureAuthenticated = require('utils/guards').ensureAuthenticated;
-const userGetter = require('passport-mariola/user-db-getter');
+const {
+    createToken,
+    createRefreshToken } = require('passport-mariola/jwt');
+const { ensureAuthenticatedByRefreshToken } = require('utils/guards');
+const { findUser } = require('passport-mariola/user-db-getter');
+const { Unauthorized } = require('utils/errors');
 
-router.get('/facebook/token',
-    passport.authenticate('facebook-token', {session: false}),
-    (req, res) => {
-        res.send({
-            token: jwt(req.user),
-            refreshToken: jsonwebtoken.sign({
+
+router.get('/facebook/token', passport.authenticate('facebook-token', {session: false}), (req, res, next) => {
+    res
+        .send({
+            token: createToken(req.user),
+            refreshToken: createRefreshToken({
                 id: req.user.id,
                 fbProfileId: req.user.fbProfileId
-            }, salt(), {})
-        });
-    }
-);
-
-router.get('/token/refresh',
-    ensureAuthenticated,
-    async (req, res) => {
-        const user = await userGetter(req.user.fbProfileId);
-
-        if(user){
-            res.send({
-                token: jwt(user)
             })
-        } else {
-            res
-                .status(401)
-                .send()
-        }
+        })
+        .catch(err => next(err))
+});
+
+router.get('/token/refresh', ensureAuthenticatedByRefreshToken, (req, res, next) => {
+    findUser(req.user.fbProfileId)
+        .then(user => {
+            if ( !user ){
+                throw new Unauthorized()
+            }
+
+            return user
+        })
+        .then(user => res.send({
+            token: createToken(user)
+        }))
+        .catch(err => next(err))
 });
 
 module.exports = router;

@@ -1,9 +1,9 @@
 const express = require('express');
 const logger = require('morgan');
 const bodyParser = require('body-parser');
-const passport = require('./config/passport-mariola/passport');
+const passport = require('passport-mariola');
 const api = require('./routes/api');
-const cors = require('cors')
+const cors = require('cors');
 
 const app = express();
 

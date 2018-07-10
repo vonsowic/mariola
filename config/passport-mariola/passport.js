@@ -2,9 +2,13 @@ const passport = require('passport');
 const FacebookStrategy = require('passport-facebook-token');
 const db = require('database');
 const {
+    salt,
+    refreshSalt } = require('./salt');
+const {
     findUser,
     formatUser
 } = require('./user-db-getter');
+
 const isTestMode = require('utils/is-test-mode');
 
 const Strategy = isTestMode()
@@ -26,7 +30,9 @@ passport.use(new FacebookStrategy({
     }
 ));
 
-passport.use('jwt', new Strategy());
+passport.use('jwt', new Strategy(salt));
+
+passport.use('refresh', new Strategy(refreshSalt));
 
 
 function createUser(profile) {
