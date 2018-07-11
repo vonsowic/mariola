@@ -8,6 +8,10 @@ const {
     createIntention
 } = require('./dbhelper');
 
+const {
+    NoContent
+} = require('utils/errors');
+
 const {Exchanged} = require('database');
 const {assert} = require('chai');
 
@@ -55,11 +59,17 @@ describe('Exchanges tests', () => {
     });
 
     it('User1 and tester should exchange their Study of Ancient Runes course', async () => {
-        await createIntention(user1, c1g1);
-        await createIntention(user2, c1g1);
-        await createIntention(testerId, c1g2);
+        try {
+            await createIntention(user1, c1g1);
+            await createIntention(user2, c1g1);
+            await createIntention(testerId, c1g2);
+        } catch (err) {
+            assert(err instanceof NoContent)
+        }
 
         const e = await Exchanged.findOne();
+
+
         // assert.equal(e.userFrom, user1);
         // assert.equal(e.userTo, testerId);
         // assert.equal(e.whatId, c1g2);
@@ -67,19 +77,28 @@ describe('Exchanges tests', () => {
     });
 
     it('No exchages', async () => {
-        await createIntention(user1, c1g1);
-        await createIntention(user2, c1g1);
-        await createIntention(testerId, c2g2);
+        try {
+            await createIntention(user1, c1g1);
+            await createIntention(user2, c1g1);
+            await createIntention(testerId, c2g2);
+        } catch (err) {
+            assert(err instanceof NoContent)
+        }
 
         const {count} = await Exchanged.findAndCountAll();
         // assert.equal(count, 0, `There should be no exchages, not ${count}`)
     });
 
     it('User2 and tester should exchange their Alchemy course', async () => {
-        await createIntention(user1, c1g1);
-        await createIntention(user2, c1g1);
-        await createIntention(user2, c2g1);
-        await createIntention(testerId, c2g2);
+        try {
+            await createIntention(user1, c1g1);
+            await createIntention(user2, c1g1);
+            await createIntention(user2, c2g1);
+            await createIntention(testerId, c2g2);
+        } catch (err) {
+            assert(err instanceof NoContent)
+        }
+
 
 
         // assert.equal(e.userFrom, user2);

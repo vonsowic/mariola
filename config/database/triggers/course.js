@@ -23,8 +23,8 @@ const ensureMaxNumberOfStudentsCanBeUpdated = db => course =>
     db.Faculty
         .findById(course.facultyId)
         .then(faculty => {
-            if(faculty.exchangesEnabled) {
-                throw new Locked("You can't modify this property when exchanges are enabled")
+            if(faculty.transferWithoutExchangeEnabled) {
+                throw new Locked("You can't modify this property when transfer without exchange is enabled")
             }
         });
 

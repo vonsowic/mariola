@@ -62,3 +62,7 @@ typings/
 client/node_modules
 mariola-test.db
 docker-compose.yml
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
