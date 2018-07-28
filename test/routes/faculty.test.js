@@ -67,7 +67,7 @@ describe('Faculty endpoints', () => {
 
             request()
                 .get(`/api/faculties/${faculty.id}/groups`)
-                .then((err, res) => {
+                .end((err, res) => {
                     assert.equal(res.status, 200);
                     assert.equal(res.body.length, 8, "Expected list with 8 elements, not " + res.body.length);
                 })
