@@ -63,7 +63,7 @@ describe('Faculty endpoints', () => {
 
     describe('GET /:facultyId/groups', () => {
         it('Should return list with 8 elements', async () => {
-            const faculty = await createFaculty();
+            const faculty = await createFaculty('Informatyka', 'http://student.agh.edu.pl/~miwas/plan-mocks.json');
 
             request()
                 .get(`/api/faculties/${faculty.id}/groups`)
