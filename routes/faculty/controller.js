@@ -50,20 +50,20 @@ const whereSelector = (onlyMy, userId) =>
 router.post('/join', (req, res, next) => {
     if( !req.body.facultyId || !req.body.initialGroup){
         next(new BadRequest("FacultyId of initialGroup missing"))
+    } else {
+        Recruiter.begin()
+            .withUser(req.user.id)
+            .toFaculty(req.body.facultyId)
+            .inGroup(req.body.initialGroup)
+            .end()
+            .then(() => {
+                unauthenticate(req.user);
+                res
+                    .status(201)
+                    .send()
+            })
+            .catch(() => next(new Conflict("you are already member of this faculty")))
     }
-
-    Recruiter.begin()
-        .withUser(req.user.id)
-        .toFaculty(req.body.facultyId)
-        .inGroup(req.body.initialGroup)
-        .end()
-        .then(() => {
-            unauthenticate(req.user);
-            res
-                .status(201)
-                .send()
-        })
-        .catch(() => next(new Conflict("you are already member of this faculty")))
 });
 
 
