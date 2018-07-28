@@ -9,7 +9,7 @@
     "dev": "concurrently \"nodemon ./bin/api.js\" \"npm:notification\"",
     "api": "node ./bin/api.js",
     "notification": "node ./notification",
-    "test": "EXPIRATION_TIME_AS_SECONDS=900 CLIENT_ID=0 DATABASE_URL=postgres://localhost:5432/mariolatest RUN_AS=432165447 mocha --timeout 10000 --recursive --exit test/triggers"
+    "test": "EXPIRATION_TIME_AS_SECONDS=900 CLIENT_ID=0 DATABASE_URL=postgres://localhost:5432/mariolatest RUN_AS=432165447 mocha --timeout 10000 --recursive --exit"
   },
   "dependencies": {
     "axios": "^0.18.0",
