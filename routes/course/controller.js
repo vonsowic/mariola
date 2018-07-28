@@ -58,18 +58,15 @@ router.get('/', ensureFacultyMember, (req, res, next) => {
 
 router.get('/general', ensureFacultyMember, (req, res, next) => {
     const key = `course-general-${req.query.facultyId}`;
-    cache.get(key, (err, result) => {
-        if (result) {
-            res.send(result)
-        } else {
+    cache.getAsync(key)
+        .then(result => res.send(result))
+        .catch(() =>
             service.findWithNumberOfDetailsAndStudents(req.query.facultyId)
                 .then(dbResult => {
                     res.send(dbResult);
                     cache.set(key, JSON.stringify(dbResult))
                 })
-                .catch(err => next(err))
-        }
-    });
+                .catch(err => next(err)))
 });
 
 router.patch('/:courseId', ensureIsAdmin, (req, res, next) => {
