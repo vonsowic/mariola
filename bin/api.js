@@ -1,3 +1,4 @@
+require('module-alias/register');
 require('dotenv').config();
 require('database').connection.sync({force: process.env.DROP_DATABASE});
 

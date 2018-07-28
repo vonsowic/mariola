@@ -1,3 +1,5 @@
+require('module-alias/register');
+
 const db = require('database');
 
 

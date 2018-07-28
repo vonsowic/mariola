@@ -10,25 +10,27 @@ const ensureExchangeIsOk = () => exchange => {
     }
 };
 
-const exchangeCourses = db => exchange => {
-    db.UserCourse.update({
-        courseId: exchange.forId
-    }, {
-        where: {
-            userId: exchange.fromId,
-            courseId: exchange.whatId
-        }
-    });
-
-    db.UserCourse.update({
-        courseId: exchange.whatId
-    }, {
-        where: {
-            userId: exchange.toId,
-            courseId: exchange.forId
-        }
-    })
-};
+const exchangeCourses = db => exchange => Promise
+    .all([
+        db.UserCourse
+            .update({
+                courseId: exchange.forId
+            }, {
+                where: {
+                    userId: exchange.fromId,
+                    courseId: exchange.whatId
+                }
+            }),
+        db.UserCourse
+            .update({
+                courseId: exchange.whatId
+            }, {
+                where: {
+                    userId: exchange.toId,
+                    courseId: exchange.forId
+                }
+            })
+    ]);
 
 
 const removeIntentionAfterExchanged = db => exchanged =>

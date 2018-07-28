@@ -1,14 +1,14 @@
 const passport = require('passport-mariola');
+const cache = require('@cache');
 
+const blacklistedKey = user => `blacklisted:${user.id}`;
 
-const blacklistedDecryptedTokens = new Set;
-
-
-const unauthenticate = user => {
-    const encryptedUser = encryptUser(user);
-    blacklistedDecryptedTokens.add(encryptedUser);
-    setTimeout(() => blacklistedDecryptedTokens.delete(encryptedUser), (user.exp - user.iat) * 1000)
-};
+const unauthenticate = user => cache.set(
+    blacklistedKey(user),
+    encryptUser(user),
+    'EX',
+    (user.exp - user.iat) * 1000
+);
 
 
 const encryptUser = ({id, iat, exp}) => JSON.stringify({id, iat, exp});
@@ -49,13 +49,17 @@ const ensureIsAdmin = (idGetter=defaultIdGetter) => (req, res, next) => {
 
 
 const ensureNotLogout = (req, res, next) => {
-    if( !blacklistedDecryptedTokens.has(encryptUser(req.user)) ){
-        next()
-    } else {
-        res
-            .status(401)
-            .end()
-    }
+    cache.getAsync(blacklistedKey(req.user))
+        .then(blacklistedToken => {
+            if(blacklistedToken === encryptUser(req.user)){
+                res
+                    .status(401)
+                    .end()
+            } else {
+                next()
+            }
+        })
+        .catch(() => next())
 };
 
 
