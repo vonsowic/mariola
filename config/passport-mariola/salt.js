@@ -1,29 +1,20 @@
 const generateSalt = require('random-token');
-const cache = require('@cache');
+const { readFileSync, writeFileSync } = require("fs")
 
-let salt, refreshSalt;
+let salt,
+    refreshSalt;
 
-cache.getAsync('salt:token')
-    .then(res => {
-        salt = res;
-        return cache.getAsync('salt:refreshToken')
-            .then(res => {
-                refreshSalt = res;
-            })
-    })
-    .catch(() => {
-        salt = generateSalt(16);
-        cache.set('salt:token', salt);
+try {
+    salt=readFileSync("salt");
+    refreshSalt=readFileSync("rsalt")
+} catch (err) {
+    salt=generateSalt(16);
+    refreshSalt=generateSalt(64);
+    writeFileSync('salt', salt);
+    writeFileSync('rsalt', refreshSalt);
+}
 
-        refreshSalt = generateSalt(64);
-        cache.set('salt:refreshToken', refreshSalt);
-    })
-    .finally(() => {
-        module.exports={
-            salt,
-            refreshSalt
-        };
-    });
-
-
-
+module.exports={
+    salt,
+    refreshSalt
+};
