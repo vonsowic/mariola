@@ -29,7 +29,6 @@
     "passport-custom": "^1.0.5",
     "passport-mariola": "file:config/passport-mariola",
     "random-token": "0.0.8",
-    "redis": "^2.8.0",
     "utils": "file:utils"
   },
   "devDependencies": {
