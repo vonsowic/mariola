@@ -1,18 +1,15 @@
 const passport = require('passport-mariola');
-const cache = require('@cache');
 
-const blacklistedKey = user => `blacklisted:${user.id}`;
+const unauthenticated = new Set;
 
-const unauthenticate = user => cache.set(
-    blacklistedKey(user),
-    encryptUser(user),
-    'EX',
-    (user.exp - user.iat) * 1000
-);
+const unauthenticate = user => {
+    const u = encryptUser(user);
+    unauthenticated.add(u);
+    setTimeout(() => unauthenticated.delete(u),(user.exp - user.iat) * 1000)
+};
 
 
 const encryptUser = ({id, iat, exp}) => JSON.stringify({id, iat, exp});
-
 
 const ensureFacultyMember = (idGetter=defaultIdGetter) => (req, res, next) => {
     const facultyInfo = req.user.faculties[idGetter(req)];
@@ -29,9 +26,9 @@ const ensureFacultyMember = (idGetter=defaultIdGetter) => (req, res, next) => {
     }
 };
 
-const ensureAuthenticated = passport.authenticate('jwt', {session: false})
+const ensureAuthenticated = passport.authenticate('jwt', {session: false});
 
-const ensureAuthenticatedByRefreshToken = passport.authenticate('refresh', {session: false})
+const ensureAuthenticatedByRefreshToken = passport.authenticate('refresh', {session: false});
 
 const ensureIsAdmin = (idGetter=defaultIdGetter) => (req, res, next) => {
     try {
@@ -49,17 +46,13 @@ const ensureIsAdmin = (idGetter=defaultIdGetter) => (req, res, next) => {
 
 
 const ensureNotLogout = (req, res, next) => {
-    cache.getAsync(blacklistedKey(req.user))
-        .then(blacklistedToken => {
-            if(blacklistedToken === encryptUser(req.user)){
-                res
-                    .status(401)
-                    .end()
-            } else {
-                next()
-            }
-        })
-        .catch(() => next())
+    if(encryptUser(req.user) in unauthenticated){
+        res
+            .status(401)
+            .end()
+    } else {
+        next()
+    }
 };
 
 

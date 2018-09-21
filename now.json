@@ -1,0 +1,11 @@
+{
+  "env": {
+    "DATABASE_URL": "@postgres",
+    "CLIENT_ID": "1617633901657669",
+    "CLIENT_SECRET": "@facebook-client-secret",
+    "EXPIRATION_TIME_AS_SECONDS": "1800",
+    "DATABASE_LOGGING": "true",
+    "SALT": "@salt",
+    "REFRESH_SALT": "@rsalt"
+  }
+}

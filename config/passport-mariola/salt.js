@@ -5,8 +5,8 @@ let salt,
     refreshSalt;
 
 try {
-    salt=readFileSync("salt");
-    refreshSalt=readFileSync("rsalt")
+    salt=process.env.SALT || readFileSync("salt");
+    refreshSalt=process.env.REFRESH_SALT || readFileSync("rsalt")
 } catch (err) {
     salt=generateSalt(16);
     refreshSalt=generateSalt(64);

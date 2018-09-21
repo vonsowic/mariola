@@ -5,11 +5,14 @@
   "main": "app.js",
   "repository": "https://github.com/vonsowic/mariola",
   "scripts": {
-    "start": "concurrently npm:api npm:notification",
+    "start": "micro",
     "dev": "concurrently \"nodemon ./bin/api.js\" \"npm:notification\"",
     "api": "node ./bin/api.js",
     "notification": "node ./notification",
-    "test": "EXPIRATION_TIME_AS_SECONDS=900 CLIENT_ID=0 DATABASE_URL=postgres://localhost:5432/mariolatest RUN_AS=432165447 mocha --timeout 10000 --recursive --exit"
+    "test": "EXPIRATION_TIME_AS_SECONDS=900 CLIENT_ID=0 DATABASE_URL=postgres://localhost:5432/mariolatest RUN_AS=432165447 mocha --timeout 10000 --zzrecursive --exit"
+  },
+  "engines": {
+    "node": "9.8.0"
   },
   "dependencies": {
     "axios": "^0.18.0",
@@ -23,13 +26,13 @@
     "dotenv": "^5.0.1",
     "express": "^4.16.3",
     "jsonwebtoken": "^8.2.1",
+    "micro": "^9.3.3",
     "module-alias": "^2.1.0",
     "morgan": "~1.9.0",
     "notification-service": "file:notification",
     "passport-custom": "^1.0.5",
     "passport-mariola": "file:config/passport-mariola",
     "random-token": "0.0.8",
-    "redis": "^2.8.0",
     "utils": "file:utils"
   },
   "devDependencies": {
@@ -43,7 +46,6 @@
     "nodemon": "^1.17.2"
   },
   "_moduleAliases": {
-    "@db": "config/database",
-    "@cache": "redis"
+    "@db": "config/database"
   }
 }

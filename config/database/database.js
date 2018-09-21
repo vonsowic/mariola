@@ -15,12 +15,25 @@ const facultyTriggers = require('./triggers/faculty');
 const updateFacultyPlansCron = require('./cron-jobs/update-faculty-plans').createCronJob;
 const { importPlan }= require('utils/import-plan');
 
-const db = new Sequelize(
-    process.env.DATABASE_URL,
-    Object.assign(
-        { logging: process.env.DATABASE_LOGGING === 'true' ? console.log : false },
-        { timezone: 'Europe/Warsaw' })
-);
+if (!process.env.DATABASE_URL){
+    process.env.DATABASE_URL=`postgres://postgres:7u75e75au19e61a9a60@35.234.66.235:5432/marioladb`
+}
+
+const config = {
+    timezone: 'Europe/Warsaw'
+};
+
+if (process.env.NODE_ENV==="production") {
+    config.dialectOptions={
+        socketPath: `/cloudsql/${process.env.INSTANCE_CONNECTION_NAME}`
+    }
+}
+
+if (process.env.DATABASE_LOGGING === 'true') {
+    config.logging=console.log
+}
+
+const db = new Sequelize(process.env.DATABASE_URL, config);
 
 
 // TABLES

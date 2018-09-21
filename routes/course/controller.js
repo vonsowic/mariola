@@ -4,7 +4,6 @@ const db = require('database');
 const {getMondayDate, getSundayDate} = require('utils/datetime');
 const { NotAllowed } = require('utils/errors');
 const guards = require('utils/guards');
-const cache = require('@cache');
 
 const normalizeDate = dateStr => dateStr
     ? dateStr.replace('"', '')
@@ -57,16 +56,9 @@ router.get('/', ensureFacultyMember, (req, res, next) => {
 });
 
 router.get('/general', ensureFacultyMember, (req, res, next) => {
-    const key = `course-general-${req.query.facultyId}`;
-    cache.getAsync(key)
-        .then(result => res.send(result))
-        .catch(() =>
-            service.findWithNumberOfDetailsAndStudents(req.query.facultyId)
-                .then(dbResult => {
-                    res.send(dbResult);
-                    cache.set(key, JSON.stringify(dbResult))
-                })
-                .catch(err => next(err)))
+    service.findWithNumberOfDetailsAndStudents(req.query.facultyId)
+                .then(dbResult => res.send(dbResult))
+                .catch(err => next(err))
 });
 
 router.patch('/:courseId', ensureIsAdmin, (req, res, next) => {
